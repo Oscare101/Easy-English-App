@@ -10,6 +10,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LinearGradient } from 'expo-linear-gradient'
 
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../firebase-config'
+// const auth = getAuth()
+
 const width = Dimensions.get('window').width
 
 export default function LogInScreen(props) {
@@ -23,19 +27,22 @@ export default function LogInScreen(props) {
   //   }
   // }, [isFocused])
 
-  async function SaveData() {
-    try {
-      await AsyncStorage.setItem('@email', email)
-      await AsyncStorage.setItem('@password', password)
-    } catch (e) {
-      console.log(e)
-    }
+  function login() {
+    signInWithEmailAndPassword(auth, email, password)
+      .then(async (re) => {
+        await AsyncStorage.setItem('email', email)
+        await AsyncStorage.setItem('password', password)
+        setEmail('')
+        setPassword('')
+        props.onChange('main')
+      })
+      .catch((err) => console.log(err))
   }
 
   async function GetStorageEmail() {
     try {
-      const getEmail = await AsyncStorage.getItem('@email')
-      const getPassword = await AsyncStorage.getItem('@password')
+      const getEmail = await AsyncStorage.getItem('email')
+      const getPassword = await AsyncStorage.getItem('password')
       if (getEmail !== null) {
         setEmail(getEmail)
         setPassword(getPassword)
@@ -54,8 +61,8 @@ export default function LogInScreen(props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.line} />
-        <Text style={styles.title}>The Bank</Text>
-        <Text style={styles.titleText}>your pocket bank</Text>
+        <Text style={styles.title}>Easy English</Text>
+        <Text style={styles.titleText}>your pocket mentor</Text>
       </View>
       <View style={styles.bottomBlock}>
         <View style={styles.inputBlock}>
@@ -84,8 +91,7 @@ export default function LogInScreen(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              SaveData()
-              props.onChange('main')
+              login()
             }}
             activeOpacity={0.8}
             style={styles.touch}

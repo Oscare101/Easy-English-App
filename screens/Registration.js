@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -10,27 +10,62 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LinearGradient } from 'expo-linear-gradient'
 
+import { collection, addDoc } from 'firebase/firestore'
+// import { getDatabase, get } from 'firebase/database'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { auth, db } from '../firebase-config'
+
+import {
+  getDatabase,
+  get,
+  ref,
+  set,
+  onValue,
+  push,
+  update,
+} from 'firebase/database'
+const database = getDatabase()
+
 const width = Dimensions.get('window').width
 
 export default function RegistrationScreen(props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [unique, setUnique] = useState('')
+  const [name, setName] = useState('')
 
-  async function SaveData() {
-    try {
-      await AsyncStorage.setItem('@email', email)
-      await AsyncStorage.setItem('@password', password)
-    } catch (e) {
-      console.log(e)
-    }
+  async function createUser() {
+    set(ref(database, 'users/' + email.replace('.', ',')), {
+      'user-name': name,
+      'user-email': email,
+      'user-unique': unique,
+      'user-icon': '',
+      'user-gender': '',
+      'user-age': '',
+      'user-level': 1,
+      'user-status': 'student',
+    })
+  }
+
+  function register() {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (re) => {
+        await AsyncStorage.setItem('email', email)
+        await AsyncStorage.setItem('password', password)
+
+        createUser()
+
+        props.onChange('main')
+      })
+      .catch((err) => console.log(err))
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.line} />
-        <Text style={styles.title}>The Bank</Text>
-        <Text style={styles.titleText}>your pocket bank</Text>
+        <Text style={styles.title}>Easy English</Text>
+        <Text style={styles.titleText}>your pocket mentor</Text>
       </View>
       <View style={styles.bottomBlock}>
         <View style={styles.inputBlock}>
@@ -47,6 +82,20 @@ export default function RegistrationScreen(props) {
             onChangeText={(text) => setPassword(text)}
           />
         </View>
+        <View style={styles.inputBlock}>
+          <TextInput
+            value={name}
+            placeholder="name"
+            onChangeText={(text) => setName(text)}
+          />
+        </View>
+        <View style={styles.inputBlock}>
+          <TextInput
+            value={unique}
+            placeholder="unique nickname"
+            onChangeText={(text) => setUnique(text)}
+          />
+        </View>
 
         <LinearGradient
           // Button Linear Gradient
@@ -59,8 +108,7 @@ export default function RegistrationScreen(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              SaveData()
-              props.onChange('main')
+              register()
             }}
             activeOpacity={0.8}
             style={styles.touch}

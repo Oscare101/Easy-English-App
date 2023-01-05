@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Text,
   View,
@@ -9,13 +9,41 @@ import {
   Pressable,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import {
+  getDatabase,
+  get,
+  ref,
+  set,
+  onValue,
+  push,
+  update,
+} from 'firebase/database'
+const database = getDatabase()
+import { collection, getDocs } from 'firebase/firestore'
+import { signOut } from 'firebase/auth'
+import { auth, db } from '../firebase-config'
 
 export default function ProfileScreen(props) {
+  const [userData, setUserData] = useState({})
   const dataFlatList = [
     { text: 'Create a new post', icon: 'add-circle-outline' },
     { text: 'Open chats', icon: 'chatbubble-ellipses-outline' },
     { text: 'Settings', icon: 'settings-outline' },
   ]
+
+  function logOut() {
+    signOut(auth)
+      .then(async () => {
+        await AsyncStorage.setItem('email', '')
+        await AsyncStorage.setItem('password', '')
+        props.onChange('login')
+      })
+      .catch((error) => {
+        // An error happened.
+      })
+  }
 
   function renderItem(item) {
     return (
@@ -48,6 +76,23 @@ export default function ProfileScreen(props) {
     )
   }
 
+  // const GetUser = async () => {
+  //   const querySnapshot = await getDocs(
+  //     collection(db, 'users', auth.currentUser.email.replace('.', ','))
+  //   )
+  //   console.log(querySnapshot)
+  // }
+
+  useEffect(() => {
+    const dataAboutUser = ref(
+      database,
+      'users/' + auth.currentUser.email.replace('.', ',')
+    )
+    onValue(dataAboutUser, (snapshot) => {
+      setUserData(snapshot.val())
+    })
+  }, [])
+
   return (
     <View style={styles.container}>
       <View style={styles.profileBlock}>
@@ -61,13 +106,16 @@ export default function ProfileScreen(props) {
             }}
           />
           <View style={styles.nameBlock}>
-            <Text style={styles.name}>Kyryl</Text>
-            <Text style={styles.email}>123@gmail.com</Text>
+            <Text style={styles.name}>{userData['user-name']}</Text>
+            <Text style={styles.email}>
+              {auth.currentUser.email}
+              {auth.currentUser.metadata.lastSignInTime
+                .split(' ')
+                .splice(1, 3)
+                .join(' ')}
+            </Text>
           </View>
-          <TouchableOpacity
-            onPress={() => props.onChange('login')}
-            style={styles.botBlock}
-          >
+          <TouchableOpacity onPress={() => logOut()} style={styles.botBlock}>
             <View style={styles.dot} />
             <View style={styles.dot} />
             <View style={styles.dot} />
