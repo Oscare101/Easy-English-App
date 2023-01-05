@@ -1,20 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import 'react-native-gesture-handler'
+import React, { useState } from 'react'
+import FirstScreen from './screens/FirstScreen'
+import LogInScreen from './screens/LogInScreen'
+import RegistrationScreen from './screens/Registration'
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [status, setStatus] = useState('login')
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  const content =
+    status == 'login' ? (
+      <LogInScreen onChange={(whereTo) => setStatus(whereTo)} />
+    ) : status == 'registration' ? (
+      <RegistrationScreen onChange={(whereTo) => setStatus(whereTo)} />
+    ) : (
+      <FirstScreen onChange={(whereTo) => setStatus(whereTo)} />
+    )
+
+  return content
+}

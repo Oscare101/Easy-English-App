@@ -1,0 +1,96 @@
+{
+  "users": {
+    "123@gmail.com": {
+      "email": "123@gmail.com",
+      "name": "Kyryl",
+      "icon": "img.jpg",
+      "status": "student / mentor",
+      "created": "23.12.2022",
+      "age": 22,
+      "level": 2,
+
+      "interests": ["Programing", "B1", "B2", "Irregular words"],
+
+      "friends": {
+        "friend1@gmail.com": {
+          "email": "friend1@gmail.com",
+          "name": "Rodion",
+          "chat": "321645"
+        },
+        "MORE FRIENDS": "-----------------"
+      },
+
+      "chats": {
+        "32164": {
+          "id": "32164",
+          "friend-name": "Rodion"
+        },
+        "MORE CHATS": "-----------------"
+      },
+
+      "topPosts": {
+        "time": "23.12.2022 13:32",
+        "author-email": "123@gmail.com",
+        "author-name": "Kyryl",
+        "text": "I'm a student:)",
+        "likes": 24
+      },
+
+      "posts": [
+        {
+          "time": "23.12.2022 13:22",
+          "author-email": "123@gmail.com",
+          "author-name": "Kyryl",
+          "text": "Hi, how are you?",
+          "likes": 12
+        }
+      ]
+    }
+  },
+
+  "chats": {
+    "32164": {
+      "id": "32164",
+      "users": [
+        {
+          "email": "123@gmail.com",
+          "name": "Kyryl"
+        },
+        {
+          "email": "friend1@gmail.com",
+          "name": "Rodion"
+        }
+      ],
+      "messages": [
+        {
+          "time": "23.12.2022 13:22",
+          "author-email": "123@gmail.com",
+          "author-name": "Kyryl",
+          "text": "Hi, how are you?"
+        },
+        {
+          "time": "23.12.2022 13:24",
+          "author-email": "friend1@gmail.com",
+          "author-name": "Rodion",
+          "text": "Hey, I'm good, you?"
+        }
+      ]
+    },
+    "MORE CHATS": "-----------------"
+  },
+
+  "news-": [
+    {
+      "--------": "----------"
+    }
+  ],
+  "users-posts": [
+    {
+      "time": "23.12.2022 13:22",
+      "author-email": "123@gmail.com",
+      "author-name": "Kyryl",
+      "text": "Hi, how are you?",
+      "likes": 12
+    }
+  ]
+}
