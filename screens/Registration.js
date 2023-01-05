@@ -33,6 +33,7 @@ export default function RegistrationScreen(props) {
   const [password, setPassword] = useState('')
   const [unique, setUnique] = useState('')
   const [name, setName] = useState('')
+  const [emails, setEmails] = useState({})
 
   async function createUser() {
     set(ref(database, 'users/' + email.replace('.', ',')), {
@@ -60,6 +61,18 @@ export default function RegistrationScreen(props) {
       .catch((err) => console.log(err))
   }
 
+  // useEffect(() => {
+  //   //every user must have an email
+  //   firebase
+  //     .database()
+  //     .ref(`users/${email.replace('.', ',')}`)
+  //     .once('value', (snapshot) => {
+  //       if (snapshot.exists()) {
+  //         console.log('exists!')
+  //       }
+  //     })
+  // }, [])
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -72,7 +85,9 @@ export default function RegistrationScreen(props) {
           <TextInput
             value={email}
             placeholder="email"
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={(text) => {
+              setEmail(text)
+            }}
           />
         </View>
         <View style={styles.inputBlock}>

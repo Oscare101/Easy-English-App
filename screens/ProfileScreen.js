@@ -24,6 +24,7 @@ const database = getDatabase()
 import { collection, getDocs } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
 import { auth, db } from '../firebase-config'
+import colors from '../constants/colors'
 
 export default function ProfileScreen(props) {
   const [userData, setUserData] = useState({})
@@ -50,7 +51,7 @@ export default function ProfileScreen(props) {
       <Pressable
         style={({ pressed }) => [
           {
-            backgroundColor: pressed ? '#F6F6F6' : '#fff',
+            backgroundColor: pressed ? colors.buttunActivePale : '#fff',
           },
           styles.underProfileItem,
         ]}

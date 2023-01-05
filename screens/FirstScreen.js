@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Header from '../conponents/Header'
-import Drawer from '../conponents/Drawer'
+import Header from '../components/Header'
+import Drawer from '../components/Drawer'
 import ProfileScreen from './ProfileScreen'
 
 export default function FirstScreen(props) {

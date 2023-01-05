@@ -119,14 +119,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   burgerButtonBlock: {
-    width: 23,
+    width: 33,
     height: 23,
   },
   burgerButtonLine: {
-    width: 23,
+    width: 33,
     height: 3,
     borderRadius: 40,
-    backgroundColor: '#000',
+    backgroundColor: '#666',
   },
 
   title: {
