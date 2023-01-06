@@ -15,9 +15,12 @@ import colors from '../constants/colors'
 const dataFlatList = [
   { text: 'Personal information', icon: '' },
   { text: 'Privacy', icon: '' },
+  { text: 'Friends', icon: '' },
 ]
 
 export default function SettingsProfile(props) {
+  const [currentSettings, setCurrentSettings] = useState('main')
+
   function renderItem(item) {
     return (
       <Pressable
@@ -50,9 +53,9 @@ export default function SettingsProfile(props) {
     )
   }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.block}>
+  const main = (
+    <>
+      <View style={styles.settingsMenuBlock}>
         <Text style={styles.title}>Settings</Text>
         <FlatList
           style={{ width: '100%' }}
@@ -66,6 +69,7 @@ export default function SettingsProfile(props) {
           <Ionicons name="ios-close-outline" size={35} color="black" />
         </TouchableOpacity>
       </View>
+
       <View style={styles.logOutBlock}>
         <LinearGradient
           // Button Linear Gradient
@@ -91,6 +95,15 @@ export default function SettingsProfile(props) {
           at any time
         </Text>
       </View>
+    </>
+  )
+  console.log(currentSettings)
+
+  let content = currentSettings == 'main' ? main : <></>
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.block}>{content}</View>
     </View>
   )
 }
@@ -104,12 +117,17 @@ const styles = StyleSheet.create({
   },
   block: {
     width: '80%',
-    height: '50%',
+    height: '80%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  settingsMenuBlock: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     borderRadius: 5,
     padding: 25,
+    flex: 1,
   },
   title: {
     alignSelf: 'center',
@@ -123,7 +141,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   logOutBlock: {
-    width: '80%',
+    width: '100%',
     height: 110,
     marginTop: 5,
     backgroundColor: '#fff',
