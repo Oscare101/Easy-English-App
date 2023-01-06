@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { LinearGradient } from 'expo-linear-gradient'
 
 import {
   getDatabase,
@@ -32,6 +33,8 @@ import SettingsProfile from '../components/SettingsProfile'
 export default function ProfileScreen(props) {
   const [userData, setUserData] = useState({})
   const [settingsProfileVisible, setSettingsProfileVisible] = useState(false)
+  const [name, setName] = useState('')
+
   const dataFlatList = [
     { text: 'Create a new post', icon: 'add-circle-outline' },
     { text: 'Open chats', icon: 'chatbubble-ellipses-outline' },
@@ -112,11 +115,7 @@ export default function ProfileScreen(props) {
           onClose={() => setSettingsProfileVisible(false)}
         />
       </Modal>
-      {/* <Modal visible={settingsProfileVisible}>
-        <View>
-          <TextInput placeholder="koemoemvoemrofermiferf" />
-        </View>
-      </Modal> */}
+
       <View style={styles.profileBlock}>
         <View style={styles.personBlock}>
           <View
@@ -233,4 +232,6 @@ const styles = StyleSheet.create({
     color: '#6D6C73',
     marginLeft: 10,
   },
+
+  ///////////////////////////////////
 })

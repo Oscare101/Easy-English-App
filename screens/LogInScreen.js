@@ -76,6 +76,7 @@ export default function LogInScreen(props) {
       <View style={styles.bottomBlock}>
         <View style={styles.inputBlock}>
           <TextInput
+            autoCapitalize="none"
             value={email}
             placeholder="email"
             onChangeText={(text) => setEmail(text.trim())}

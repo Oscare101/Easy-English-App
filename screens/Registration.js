@@ -92,6 +92,8 @@ export default function RegistrationScreen(props) {
       <View style={styles.bottomBlock}>
         <View style={styles.inputBlock}>
           <TextInput
+            autoCapitalize="none"
+            autoCorrect={false}
             value={email}
             placeholder="email"
             onChangeText={(text) => {

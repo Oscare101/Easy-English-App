@@ -37,11 +37,11 @@ export default function SettingsProfile(props) {
   const [name, setName] = useState(props.user['user-name'])
   const [age, setAge] = useState(props.user['user-age'])
 
-  function setData() {
+  function setData(newName, newAge) {
     update(ref(database, 'users/' + auth.currentUser.email.replace('.', ',')), {
-      'user-name': name,
+      'user-name': newName,
       'user-icon': '',
-      'user-age': age,
+      'user-age': newAge,
     })
   }
 
@@ -77,125 +77,134 @@ export default function SettingsProfile(props) {
     )
   }
 
-  const main = (
-    <>
-      <View style={styles.settingsMenuBlock}>
-        <Text style={styles.title}>Settings</Text>
-        <FlatList
-          style={{ width: '100%' }}
-          data={dataFlatList}
-          renderItem={renderItem}
-        />
-        <TouchableOpacity
-          onPress={() => props.onClose()}
-          style={styles.closeButton}
-        >
-          <Ionicons name="ios-close-outline" size={35} color="black" />
-        </TouchableOpacity>
-      </View>
+  function Main() {
+    return (
+      <>
+        <View style={styles.settingsMenuBlock}>
+          <Text style={styles.title}>Settings</Text>
 
-      <View style={styles.logOutBlock}>
-        <LinearGradient
-          // Button Linear Gradient
+          <FlatList
+            style={{ width: '100%' }}
+            data={dataFlatList}
+            renderItem={renderItem}
+          />
+          <TouchableOpacity
+            onPress={() => props.onClose()}
+            style={styles.closeButton}
+          >
+            <Ionicons name="ios-close-outline" size={35} color="black" />
+          </TouchableOpacity>
+        </View>
 
-          start={[0, 0]}
-          end={[1, 1]}
-          location={[0.25, 0.4, 1]}
-          colors={[colors.gradientBlack1, colors.gradientBlack2]}
-          style={styles.buttonLogOut}
-        >
+        <View style={styles.logOutBlock}>
+          <LinearGradient
+            // Button Linear Gradient
+
+            start={[0, 0]}
+            end={[1, 1]}
+            location={[0.25, 0.4, 1]}
+            colors={[colors.gradientBlack1, colors.gradientBlack2]}
+            style={styles.buttonLogOut}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                props.onLogOut()
+              }}
+              activeOpacity={0.8}
+              style={styles.touch}
+            >
+              <Text style={styles.buttonLogOutText}>Log Out</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+          <Text style={styles.comment}>
+            All your data is stored on the server. You can log into your account
+            at any time
+          </Text>
+        </View>
+      </>
+    )
+  }
+
+  function Personal(props) {
+    const [newName, setNewName] = useState(props.user['user-name'])
+    const [newAge, setNewAge] = useState(props.user['user-age'])
+
+    // console.log(props)
+    return (
+      <View style={styles.bigBlock}>
+        <View style={styles.header}>
           <TouchableOpacity
             onPress={() => {
-              props.onLogOut()
+              setName(newName)
+              setAge(newAge)
+              setData(newName, newAge)
+              setCurrentSettings('main')
             }}
-            activeOpacity={0.8}
-            style={styles.touch}
           >
-            <Text style={styles.buttonLogOutText}>Log Out</Text>
+            <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-        </LinearGradient>
-        <Text style={styles.comment}>
-          All your data is stored on the server. You can log into your account
-          at any time
-        </Text>
-      </View>
-    </>
-  )
+          <Text style={styles.title}>Personal information</Text>
+        </View>
 
-  const personal = (
-    <View style={styles.bigBlock}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => {
-            setData()
-            setCurrentSettings('main')
-          }}
+        <Text>Name:</Text>
+        <View
+          style={[
+            styles.settingItem,
+            { backgroundColor: colors.buttunActivePale, height: 35 },
+          ]}
         >
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <TextInput
+            blurOnSubmit={true}
+            value={newName}
+            placeholder="name"
+            style={[styles.settingText, { color: '#000', width: '100%' }]}
+            onChangeText={(text) => setNewName(text)}
+          />
+        </View>
+        <Text>Email:</Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            Alert.alert(
+              'You cannot change your email',
+              ''[{ text: 'OK', onPress: () => {} }]
+            )
+          }}
+          style={[
+            styles.settingItem,
+            { backgroundColor: colors.buttunActivePale, height: 35 },
+          ]}
+        >
+          <Text style={styles.settingText}>{props.user['user-email']}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Personal information</Text>
+        <Text>Age:</Text>
+        <View
+          style={[
+            styles.settingItem,
+            { backgroundColor: colors.buttunActivePale, height: 35 },
+          ]}
+        >
+          <TextInput
+            value={newAge}
+            placeholder="age"
+            keyboardType="number-pad"
+            style={[styles.settingText, { color: '#000', width: '100%' }]}
+            onChangeText={(num) => setNewAge(num)}
+          />
+        </View>
       </View>
-
-      <Text>Name:</Text>
-      <View
-        style={[
-          styles.settingItem,
-          { backgroundColor: colors.buttunActivePale, height: 35 },
-        ]}
-      >
-        <TextInput
-          //   value={name}
-          placeholder="name"
-          style={[styles.settingText, { color: '#000', width: '100%' }]}
-          //   onChangeText={(text) => setName(text)}
-        />
-      </View>
-      <Text>Email:</Text>
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => {
-          Alert.alert(
-            'You cannot change your email',
-            ''[{ text: 'OK', onPress: () => {} }]
-          )
-        }}
-        style={[
-          styles.settingItem,
-          { backgroundColor: colors.buttunActivePale, height: 35 },
-        ]}
-      >
-        <Text style={styles.settingText}>{props.user['user-email']}</Text>
-      </TouchableOpacity>
-      <Text>Age:</Text>
-      <View
-        style={[
-          styles.settingItem,
-          { backgroundColor: colors.buttunActivePale, height: 35 },
-        ]}
-      >
-        <TextInput
-          value={age}
-          placeholder="age"
-          style={[styles.settingText, { color: '#000' }]}
-        />
-      </View>
-    </View>
-  )
-
-  function Content() {
-    switch (currentSettings) {
-      case 'main':
-        return main
-      case 'personal':
-        return personal
-    }
-    currentSettings == 'main' ? main : <></>
+    )
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.block}>
-        <Content />
+        {currentSettings == 'main' ? <Main /> : <Personal user={props.user} />}
+        <TextInput
+          placeholder="yui"
+          onChangeText={(t) => setName(t)}
+          value={name}
+        />
       </View>
     </View>
   )

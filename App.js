@@ -1,8 +1,8 @@
-import 'react-native-gesture-handler'
 import React, { useState } from 'react'
 import FirstScreen from './screens/FirstScreen'
 import LogInScreen from './screens/LogInScreen'
 import RegistrationScreen from './screens/Registration'
+
 export default function App() {
   const [status, setStatus] = useState('login')
 
