@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebase-config'
+import colors from '../constants/colors'
 // const auth = getAuth()
 
 const width = Dimensions.get('window').width
@@ -95,7 +96,7 @@ export default function LogInScreen(props) {
           start={[0, 0]}
           end={[1, 1]}
           location={[0.25, 0.4, 1]}
-          colors={['#18181b', '#35353d']}
+          colors={[colors.gradientBlack1, colors.gradientBlack2]}
           style={styles.buttonLogIn}
         >
           <TouchableOpacity
@@ -118,7 +119,7 @@ export default function LogInScreen(props) {
           start={[0, 0]}
           end={[1, 1]}
           location={[0.25, 0.4, 1]}
-          colors={['#647e72', '#86c7a6']}
+          colors={[colors.gradientGreen1, colors.gradientGreen2]}
           style={styles.buttonRegistration}
         >
           <TouchableOpacity
@@ -219,6 +220,6 @@ const styles = StyleSheet.create({
   },
 
   redText: {
-    color: 'red',
+    color: colors.red,
   },
 })

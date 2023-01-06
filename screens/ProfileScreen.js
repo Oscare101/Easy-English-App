@@ -7,6 +7,7 @@ import {
   TouchableHighlight,
   FlatList,
   Pressable,
+  Modal,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -25,9 +26,11 @@ import { collection, getDocs } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
 import { auth, db } from '../firebase-config'
 import colors from '../constants/colors'
+import SettingsProfile from '../components/SettingsProfile'
 
 export default function ProfileScreen(props) {
   const [userData, setUserData] = useState({})
+  const [settingsProfileVisible, setSettingsProfileVisible] = useState(false)
   const dataFlatList = [
     { text: 'Create a new post', icon: 'add-circle-outline' },
     { text: 'Open chats', icon: 'chatbubble-ellipses-outline' },
@@ -96,6 +99,16 @@ export default function ProfileScreen(props) {
 
   return (
     <View style={styles.container}>
+      <Modal
+        visible={settingsProfileVisible}
+        transparent={true}
+        animationType="none"
+      >
+        <SettingsProfile
+          onLogOut={() => logOut()}
+          onClose={() => setSettingsProfileVisible(false)}
+        />
+      </Modal>
       <View style={styles.profileBlock}>
         <View style={styles.personBlock}>
           <View
@@ -116,7 +129,10 @@ export default function ProfileScreen(props) {
                 .join(' ')}
             </Text>
           </View>
-          <TouchableOpacity onPress={() => logOut()} style={styles.botBlock}>
+          <TouchableOpacity
+            onPress={() => setSettingsProfileVisible(true)}
+            style={styles.botBlock}
+          >
             <View style={styles.dot} />
             <View style={styles.dot} />
             <View style={styles.dot} />

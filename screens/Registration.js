@@ -24,6 +24,7 @@ import {
   push,
   update,
 } from 'firebase/database'
+import colors from '../constants/colors'
 const database = getDatabase()
 
 const width = Dimensions.get('window').width
@@ -33,13 +34,15 @@ export default function RegistrationScreen(props) {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [uniqueEmailError, setUniqueEmailError] = useState(false)
+  const [warningEmail, setWarningEmail] = useState(false)
+
   const [correctPasswordError, setCorrectPasswordError] = useState(false)
   const [nameError, setNameError] = useState(true)
 
   async function createUser() {
-    set(ref(database, 'users/' + email.replace('.', ',')), {
+    set(ref(database, 'users/' + email.replace('.', ',').toLowerCase()), {
       'user-name': name,
-      'user-email': email,
+      'user-email': email.toLowerCase(),
       'user-icon': '',
       'user-age': '',
       'user-level': 1,
@@ -50,7 +53,7 @@ export default function RegistrationScreen(props) {
   function register() {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (re) => {
-        await AsyncStorage.setItem('email', email)
+        await AsyncStorage.setItem('email', email.toLowerCase())
         await AsyncStorage.setItem('password', password)
 
         createUser()
@@ -59,7 +62,9 @@ export default function RegistrationScreen(props) {
       })
       .catch((err) => {
         if (err.message.includes('auth/invalid-email')) {
-          setCorrectPasswordError('Invalid email')
+          setUniqueEmailError('Invalid email')
+        } else if (err.message.includes('auth/email-already-in-use')) {
+          setUniqueEmailError('This email is already used')
         }
         console.log(err.message)
       })
@@ -90,10 +95,11 @@ export default function RegistrationScreen(props) {
             value={email}
             placeholder="email"
             onChangeText={(text) => {
+              setUniqueEmailError(false)
               try {
                 const dataAboutUser = ref(
                   database,
-                  'users/' + text.replace(' ', '').replace('.', ',')
+                  'users/' + text.replace(' ', '')
                 )
                 onValue(dataAboutUser, (snapshot) => {
                   if (snapshot.exists()) {
@@ -106,13 +112,24 @@ export default function RegistrationScreen(props) {
               } catch (error) {
                 console.log(error)
               }
-
+              if (text.toLowerCase() !== text) {
+                setWarningEmail(
+                  `Email cannot contain capital letters. You will be registered by email ${text.toLowerCase()}`
+                )
+              } else {
+                setWarningEmail(false)
+              }
               setEmail(text.replace(' ', ''))
             }}
           />
         </View>
         {uniqueEmailError ? (
           <Text style={styles.redText}>{uniqueEmailError}</Text>
+        ) : (
+          <></>
+        )}
+        {warningEmail ? (
+          <Text style={styles.yellowText}>{warningEmail}</Text>
         ) : (
           <></>
         )}
@@ -161,16 +178,18 @@ export default function RegistrationScreen(props) {
           start={[0, 0]}
           end={[1, 1]}
           location={[0.25, 0.4, 1]}
-          colors={['#18181b', '#35353d']}
+          colors={[colors.gradientBlack1, colors.gradientBlack2]}
           style={styles.buttonLogIn}
         >
           <TouchableOpacity
             onPress={() => {
               if (email.length == 0) {
                 setUniqueEmailError('Please type your email')
-              } else if (uniqueEmailError) {
-                setUniqueEmailError('This email is already used')
-              } else if (password.length == 0) {
+              }
+              // else if (uniqueEmailError) {
+              //   setUniqueEmailError('This email is already used')
+              // }
+              else if (password.length == 0) {
                 setCorrectPasswordError(
                   'Your password must include at least 6 symbols'
                 )
@@ -196,7 +215,7 @@ export default function RegistrationScreen(props) {
           start={[0, 0]}
           end={[1, 1]}
           location={[0.25, 0.4, 1]}
-          colors={['#647e72', '#86c7a6']}
+          colors={[colors.gradientGreen1, colors.gradientGreen2]}
           style={styles.buttonRegistration}
         >
           <TouchableOpacity
@@ -297,6 +316,9 @@ const styles = StyleSheet.create({
   },
 
   redText: {
-    color: 'red',
+    color: colors.red,
+  },
+  yellowText: {
+    color: colors.yellow,
   },
 })
