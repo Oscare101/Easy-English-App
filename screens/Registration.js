@@ -31,17 +31,16 @@ const width = Dimensions.get('window').width
 export default function RegistrationScreen(props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [unique, setUnique] = useState('')
   const [name, setName] = useState('')
-  const [emails, setEmails] = useState({})
+  const [uniqueEmailError, setUniqueEmailError] = useState(false)
+  const [correctPasswordError, setCorrectPasswordError] = useState(false)
+  const [nameError, setNameError] = useState(true)
 
   async function createUser() {
     set(ref(database, 'users/' + email.replace('.', ',')), {
       'user-name': name,
       'user-email': email,
-      'user-unique': unique,
       'user-icon': '',
-      'user-gender': '',
       'user-age': '',
       'user-level': 1,
       'user-status': 'student',
@@ -58,7 +57,12 @@ export default function RegistrationScreen(props) {
 
         props.onChange('main')
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        if (err.message.includes('auth/invalid-email')) {
+          setCorrectPasswordError('Invalid email')
+        }
+        console.log(err.message)
+      })
   }
 
   // useEffect(() => {
@@ -86,32 +90,71 @@ export default function RegistrationScreen(props) {
             value={email}
             placeholder="email"
             onChangeText={(text) => {
-              setEmail(text)
+              try {
+                const dataAboutUser = ref(
+                  database,
+                  'users/' + text.replace(' ', '').replace('.', ',')
+                )
+                onValue(dataAboutUser, (snapshot) => {
+                  if (snapshot.exists()) {
+                    if (text.replace(' ', '').length != 0)
+                      setUniqueEmailError('This email is already used')
+                  } else {
+                    setUniqueEmailError(false)
+                  }
+                })
+              } catch (error) {
+                console.log(error)
+              }
+
+              setEmail(text.replace(' ', ''))
             }}
           />
         </View>
+        {uniqueEmailError ? (
+          <Text style={styles.redText}>{uniqueEmailError}</Text>
+        ) : (
+          <></>
+        )}
+
         <View style={styles.inputBlock}>
           <TextInput
             value={password}
             placeholder="password"
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={(text) => {
+              if (text.trim().replace(' ', '').length != text.length) {
+                setCorrectPasswordError(
+                  `You can't use spaces inside your password`
+                )
+              } else if (text.length < 6 && text.length > 0) {
+                setCorrectPasswordError(
+                  'Your password must include at least 6 symbols'
+                )
+              } else {
+                setCorrectPasswordError(false)
+              }
+              setPassword(text)
+            }}
           />
         </View>
+        {correctPasswordError ? (
+          <Text style={styles.redText}>{correctPasswordError}</Text>
+        ) : (
+          <></>
+        )}
         <View style={styles.inputBlock}>
           <TextInput
             value={name}
             placeholder="name"
-            onChangeText={(text) => setName(text)}
+            onChangeText={(text) => {
+              if (text.trim().replace(' ', '').length > 0) {
+                setNameError(false)
+              }
+              setName(text)
+            }}
           />
         </View>
-        <View style={styles.inputBlock}>
-          <TextInput
-            value={unique}
-            placeholder="unique nickname"
-            onChangeText={(text) => setUnique(text)}
-          />
-        </View>
-
+        {nameError ? <Text style={styles.redText}>{nameError}</Text> : <></>}
         <LinearGradient
           // Button Linear Gradient
 
@@ -123,7 +166,19 @@ export default function RegistrationScreen(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              register()
+              if (email.length == 0) {
+                setUniqueEmailError('Please type your email')
+              } else if (uniqueEmailError) {
+                setUniqueEmailError('This email is already used')
+              } else if (password.length == 0) {
+                setCorrectPasswordError(
+                  'Your password must include at least 6 symbols'
+                )
+              } else if (name.trim().replace(' ', '').length == 0) {
+                setNameError('Please enter your name')
+              } else {
+                register()
+              }
             }}
             activeOpacity={0.8}
             style={styles.touch}
@@ -239,5 +294,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     height: '100%',
+  },
+
+  redText: {
+    color: 'red',
   },
 })

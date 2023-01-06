@@ -19,6 +19,7 @@ const width = Dimensions.get('window').width
 export default function LogInScreen(props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState(false)
 
   // useEffect(() => {
   //   // Call only when screen open or when back on screen
@@ -36,7 +37,14 @@ export default function LogInScreen(props) {
         setPassword('')
         props.onChange('main')
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err.message)
+        if (err.message.includes('auth/wrong-password')) {
+          setError('Wrong email or password')
+        } else {
+          setError('Invalid email')
+        }
+      })
   }
 
   async function GetStorageEmail() {
@@ -69,7 +77,7 @@ export default function LogInScreen(props) {
           <TextInput
             value={email}
             placeholder="email"
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={(text) => setEmail(text.trim())}
           />
         </View>
         <View style={styles.inputBlock}>
@@ -79,6 +87,7 @@ export default function LogInScreen(props) {
             onChangeText={(text) => setPassword(text)}
           />
         </View>
+        {error ? <Text style={styles.redText}>{error}</Text> : <></>}
 
         <LinearGradient
           // Button Linear Gradient
@@ -207,5 +216,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     height: '100%',
+  },
+
+  redText: {
+    color: 'red',
   },
 })
