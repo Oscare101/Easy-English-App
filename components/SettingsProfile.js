@@ -6,25 +6,49 @@ import {
   StyleSheet,
   FlatList,
   Pressable,
+  Alert,
+  Platform,
+  TextInput,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
-
 import colors from '../constants/colors'
 
+import { auth } from '../firebase-config'
+import {
+  getDatabase,
+  get,
+  ref,
+  set,
+  onValue,
+  push,
+  update,
+} from 'firebase/database'
+const database = getDatabase()
+
 const dataFlatList = [
-  { text: 'Personal information', icon: '' },
-  { text: 'Privacy', icon: '' },
-  { text: 'Friends', icon: '' },
+  { text: 'Personal information', icon: '', path: 'personal' },
+  { text: 'Privacy', icon: '', path: 'main' },
+  { text: 'Friends', icon: '', path: 'main' },
 ]
 
 export default function SettingsProfile(props) {
   const [currentSettings, setCurrentSettings] = useState('main')
+  const [name, setName] = useState(props.user['user-name'])
+  const [age, setAge] = useState(props.user['user-age'])
+
+  function setData() {
+    update(ref(database, 'users/' + auth.currentUser.email.replace('.', ',')), {
+      'user-name': name,
+      'user-icon': '',
+      'user-age': age,
+    })
+  }
 
   function renderItem(item) {
     return (
       <Pressable
-        onPress={() => {}}
+        onPress={() => setCurrentSettings(item.item.path)}
         style={({ pressed }) => [
           {
             backgroundColor: pressed ? colors.buttunActivePale : '#fff',
@@ -97,13 +121,82 @@ export default function SettingsProfile(props) {
       </View>
     </>
   )
-  console.log(currentSettings)
 
-  let content = currentSettings == 'main' ? main : <></>
+  const personal = (
+    <View style={styles.bigBlock}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => {
+            setData()
+            setCurrentSettings('main')
+          }}
+        >
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Personal information</Text>
+      </View>
+
+      <Text>Name:</Text>
+      <View
+        style={[
+          styles.settingItem,
+          { backgroundColor: colors.buttunActivePale, height: 35 },
+        ]}
+      >
+        <TextInput
+          //   value={name}
+          placeholder="name"
+          style={[styles.settingText, { color: '#000', width: '100%' }]}
+          //   onChangeText={(text) => setName(text)}
+        />
+      </View>
+      <Text>Email:</Text>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          Alert.alert(
+            'You cannot change your email',
+            ''[{ text: 'OK', onPress: () => {} }]
+          )
+        }}
+        style={[
+          styles.settingItem,
+          { backgroundColor: colors.buttunActivePale, height: 35 },
+        ]}
+      >
+        <Text style={styles.settingText}>{props.user['user-email']}</Text>
+      </TouchableOpacity>
+      <Text>Age:</Text>
+      <View
+        style={[
+          styles.settingItem,
+          { backgroundColor: colors.buttunActivePale, height: 35 },
+        ]}
+      >
+        <TextInput
+          value={age}
+          placeholder="age"
+          style={[styles.settingText, { color: '#000' }]}
+        />
+      </View>
+    </View>
+  )
+
+  function Content() {
+    switch (currentSettings) {
+      case 'main':
+        return main
+      case 'personal':
+        return personal
+    }
+    currentSettings == 'main' ? main : <></>
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.block}>{content}</View>
+      <View style={styles.block}>
+        <Content />
+      </View>
     </View>
   )
 }
@@ -132,13 +225,28 @@ const styles = StyleSheet.create({
   title: {
     alignSelf: 'center',
     fontSize: 20,
-    letterSpacing: 2,
+    letterSpacing: 1,
   },
   closeButton: {
     position: 'absolute',
     top: 10,
     right: 10,
     padding: 10,
+  },
+  bigBlock: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 25,
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+    paddingBottom: 10,
+    marginBottom: 10,
   },
   logOutBlock: {
     width: '100%',

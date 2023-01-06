@@ -8,6 +8,7 @@ import {
   FlatList,
   Pressable,
   Modal,
+  TextInput,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -105,10 +106,17 @@ export default function ProfileScreen(props) {
         animationType="none"
       >
         <SettingsProfile
+          visible={settingsProfileVisible}
+          user={userData}
           onLogOut={() => logOut()}
           onClose={() => setSettingsProfileVisible(false)}
         />
       </Modal>
+      {/* <Modal visible={settingsProfileVisible}>
+        <View>
+          <TextInput placeholder="koemoemvoemrofermiferf" />
+        </View>
+      </Modal> */}
       <View style={styles.profileBlock}>
         <View style={styles.personBlock}>
           <View

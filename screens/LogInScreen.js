@@ -147,12 +147,12 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: width * 0.6,
+    width: '100%',
     paddingTop: 20,
   },
 
   line: {
-    width: '100%',
+    width: '60%',
     height: 1,
     backgroundColor: '#666',
   },
