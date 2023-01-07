@@ -9,17 +9,18 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import colors from '../constants/colors'
+
 export default function Drawer(props) {
   const dataFlatList = [
-    { text: 'Profile', icon: '' },
-    { text: 'Open chats', icon: '' },
-    { text: 'Settings', icon: '' },
+    { text: 'Profile', icon: '', path: 'Profile' },
+    // { text: 'Global chats', icon: '' },
+    { text: 'Friends posts', icon: '', path: 'FriendsPosts' },
   ]
 
   function renderItem(item) {
     return (
       <Pressable
-        onPress={() => props.setScreen(item.item.text)}
+        onPress={() => props.setScreen(item.item.path)}
         style={({ pressed }) => [
           {
             backgroundColor: pressed ? colors.buttunActivePale : '#fff',

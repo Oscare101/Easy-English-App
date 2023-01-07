@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Header from '../components/Header'
 import Drawer from '../components/Drawer'
 import ProfileScreen from './ProfileScreen'
+import FriendsPosts from './FriendsPosts'
 
 export default function FirstScreen(props) {
   const [drawer, setDrawer] = useState(false)
@@ -9,6 +10,7 @@ export default function FirstScreen(props) {
 
   const screenData = {
     Profile: <ProfileScreen onChange={() => props.onChange('login')} />,
+    FriendsPosts: <FriendsPosts />,
   }
 
   return (

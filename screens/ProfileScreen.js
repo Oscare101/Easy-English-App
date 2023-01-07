@@ -10,7 +10,7 @@ import {
   Modal,
   TextInput,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, AntDesign } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LinearGradient } from 'expo-linear-gradient'
 
@@ -22,6 +22,7 @@ import {
   onValue,
   push,
   update,
+  remove,
 } from 'firebase/database'
 const database = getDatabase()
 import { collection, getDocs } from 'firebase/firestore'
@@ -29,16 +30,21 @@ import { signOut } from 'firebase/auth'
 import { auth, db } from '../firebase-config'
 import colors from '../constants/colors'
 import SettingsProfile from '../components/SettingsProfile'
+import PostCreator from '../components/PostCreator'
+import getUserTime from '../components/getUserTime'
 
 export default function ProfileScreen(props) {
   const [userData, setUserData] = useState({})
-  const [settingsProfileVisible, setSettingsProfileVisible] = useState(false)
-  const [name, setName] = useState('')
+  const [modalProfileVisible, setModalProfileVisible] = useState(false)
+  const [temporaryProfileScreen, setTemporaryProfileScreen] = useState(false)
 
   const dataFlatList = [
-    { text: 'Create a new post', icon: 'add-circle-outline' },
-    { text: 'Open chats', icon: 'chatbubble-ellipses-outline' },
-    { text: 'Settings', icon: 'settings-outline' },
+    { text: 'Create a new post', icon: 'add-circle-outline', path: 'post' },
+    {
+      text: 'Privat chats (-)',
+      icon: 'chatbubble-ellipses-outline',
+      path: 'post',
+    },
   ]
 
   function logOut() {
@@ -56,6 +62,10 @@ export default function ProfileScreen(props) {
   function renderItem(item) {
     return (
       <Pressable
+        onPress={() => {
+          setTemporaryProfileScreen(item.item.path)
+          setModalProfileVisible(true)
+        }}
         style={({ pressed }) => [
           {
             backgroundColor: pressed ? colors.buttunActivePale : '#fff',
@@ -84,12 +94,64 @@ export default function ProfileScreen(props) {
     )
   }
 
-  // const GetUser = async () => {
-  //   const querySnapshot = await getDocs(
-  //     collection(db, 'users', auth.currentUser.email.replace('.', ','))
-  //   )
-  //   console.log(querySnapshot)
-  // }
+  function CheckLike(item) {
+    let newLikes = item.likes
+    if (item.likes.includes(auth.currentUser.email)) {
+      newLikes.splice(
+        newLikes.findIndex((i) => i == auth.currentUser.email),
+        1
+      )
+    } else {
+      newLikes.push(auth.currentUser.email)
+    }
+    // console.log(item.likes, newLikes)
+    update(ref(database, 'posts/' + item.key), {
+      likes: newLikes,
+    })
+    update(
+      ref(
+        database,
+        `users/${auth.currentUser.email.replace('.', ',')}/posts/` + item.key
+      ),
+      {
+        likes: newLikes,
+      }
+    )
+  }
+
+  function Delete(key) {
+    remove(ref(database, 'posts/' + key))
+    remove(
+      ref(
+        database,
+        `users/${auth.currentUser.email.replace('.', ',')}/posts/` + key
+      )
+    )
+  }
+
+  function RenderPosts({ item }) {
+    let userTime = getUserTime(item.time)
+
+    return (
+      <TouchableOpacity
+        onLongPress={() => Delete(item.key)}
+        style={styles.postView}
+      >
+        <Text style={styles.postTitle}>{item.title}</Text>
+        <Text style={styles.postText}>{item.text}</Text>
+        <View style={styles.postBottom}>
+          <Text style={styles.postTime}>{userTime}</Text>
+          <TouchableOpacity
+            onPress={() => CheckLike(item)}
+            style={styles.postLikesBlock}
+          >
+            <Text style={styles.postLikes}>{item.likes.length - 1}</Text>
+            <AntDesign name="like2" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    )
+  }
 
   useEffect(() => {
     const dataAboutUser = ref(
@@ -101,21 +163,8 @@ export default function ProfileScreen(props) {
     })
   }, [])
 
-  return (
-    <View style={styles.container}>
-      <Modal
-        visible={settingsProfileVisible}
-        transparent={true}
-        animationType="none"
-      >
-        <SettingsProfile
-          visible={settingsProfileVisible}
-          user={userData}
-          onLogOut={() => logOut()}
-          onClose={() => setSettingsProfileVisible(false)}
-        />
-      </Modal>
-
+  function TopProfileBlock() {
+    return (
       <View style={styles.profileBlock}>
         <View style={styles.personBlock}>
           <View
@@ -137,7 +186,10 @@ export default function ProfileScreen(props) {
             </Text>
           </View>
           <TouchableOpacity
-            onPress={() => setSettingsProfileVisible(true)}
+            onPress={() => {
+              setTemporaryProfileScreen('settings')
+              setModalProfileVisible(true)
+            }}
             style={styles.botBlock}
           >
             <View style={styles.dot} />
@@ -152,6 +204,60 @@ export default function ProfileScreen(props) {
             renderItem={renderItem}
           />
         </View>
+      </View>
+    )
+  }
+
+  function renderProfile(item) {
+    if (item.item == 'Profile') {
+      return <TopProfileBlock />
+    } else {
+      return (
+        <FlatList
+          style={{ width: '100%' }}
+          data={item.item}
+          renderItem={(item) => RenderPosts(item)}
+        />
+      )
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <Modal
+        visible={modalProfileVisible}
+        transparent={true}
+        animationType="none"
+      >
+        {temporaryProfileScreen == 'settings' ? (
+          <SettingsProfile
+            user={userData}
+            onLogOut={() => logOut()}
+            onClose={() => {
+              setModalProfileVisible(false)
+              setTemporaryProfileScreen(false)
+            }}
+          />
+        ) : temporaryProfileScreen == 'post' ? (
+          <PostCreator
+            user={userData}
+            onClose={() => {
+              setModalProfileVisible(false)
+              setTemporaryProfileScreen(false)
+            }}
+          />
+        ) : (
+          <></>
+        )}
+      </Modal>
+      {/* <TopProfileBlock /> */}
+
+      <View style={styles.postsBlock}>
+        <FlatList
+          style={{ width: '100%' }}
+          data={['Profile', Object.values({ ...userData.posts })]}
+          renderItem={renderProfile}
+        />
       </View>
     </View>
   )
@@ -172,7 +278,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     marginTop: 20,
+    marginBottom: 5,
   },
+
   personBlock: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -234,4 +342,49 @@ const styles = StyleSheet.create({
   },
 
   ///////////////////////////////////
+
+  postsBlock: {
+    width: '100%',
+    alignSelf: 'center',
+  },
+  postView: {
+    width: '90%',
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 15,
+    marginTop: 5,
+    padding: 10,
+  },
+  postTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  postText: {
+    fontSize: 18,
+    fontWeight: '400',
+  },
+  postTime: {
+    fontSize: 14,
+    fontWeight: '300',
+  },
+  postBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  postLikesBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: colors.buttunActivePale,
+  },
+  postLikes: {
+    fontSize: 20,
+    marginRight: 10,
+  },
 })

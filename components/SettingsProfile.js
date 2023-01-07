@@ -200,11 +200,6 @@ export default function SettingsProfile(props) {
     <View style={styles.container}>
       <View style={styles.block}>
         {currentSettings == 'main' ? <Main /> : <Personal user={props.user} />}
-        <TextInput
-          placeholder="yui"
-          onChangeText={(t) => setName(t)}
-          value={name}
-        />
       </View>
     </View>
   )
