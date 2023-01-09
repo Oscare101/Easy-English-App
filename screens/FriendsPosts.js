@@ -64,6 +64,9 @@ export default function FriendsPosts() {
     let userTime = getUserTime(item.time)
     return (
       <TouchableOpacity style={styles.postView}>
+        <View>
+          <Text>item</Text>
+        </View>
         <Text style={styles.postTitle}>{item.title}</Text>
         <Text style={styles.postText}>{item.text}</Text>
         <View style={styles.postBottom}>
@@ -87,7 +90,6 @@ export default function FriendsPosts() {
         data={Object.values({ ...postsData })}
         renderItem={RenderPosts}
       />
-      <Text>rtyui</Text>
     </View>
   )
 }

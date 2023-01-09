@@ -1,17 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import Drawer from '../components/Drawer'
 import ProfileScreen from './ProfileScreen'
 import FriendsPosts from './FriendsPosts'
 
+import {
+  getDatabase,
+  get,
+  ref,
+  set,
+  onValue,
+  push,
+  update,
+  remove,
+} from 'firebase/database'
+const database = getDatabase()
+import { auth } from '../firebase-config'
+
 export default function FirstScreen(props) {
   const [drawer, setDrawer] = useState(false)
   const [screen, setScreen] = useState('Profile')
+
+  // const [data, setData] = useState({})
 
   const screenData = {
     Profile: <ProfileScreen onChange={() => props.onChange('login')} />,
     FriendsPosts: <FriendsPosts />,
   }
+
+  // useEffect(() => {
+  //   const dataAboutUser = ref(database)
+  //   onValue(dataAboutUser, (snapshot) => {
+  //     setData(snapshot.val())
+  //   })
+  // }, [])
 
   return (
     <>

@@ -33,17 +33,26 @@ import SettingsProfile from '../components/SettingsProfile'
 import PostCreator from '../components/PostCreator'
 import getUserTime from '../components/getUserTime'
 
-export default function ProfileScreen(props) {
+import { createStackNavigator } from '@react-navigation/stack'
+import FriendsListScreen from './FriendsListScreen'
+const Stack = createStackNavigator()
+
+function Profile({ props, navigation }) {
   const [userData, setUserData] = useState({})
   const [modalProfileVisible, setModalProfileVisible] = useState(false)
   const [temporaryProfileScreen, setTemporaryProfileScreen] = useState(false)
 
   const dataFlatList = [
-    { text: 'Create a new post', icon: 'add-circle-outline', path: 'post' },
+    // { text: 'Create a new post', icon: 'add-circle-outline', path: 'post' },
+    // {
+    //   text: 'Privat chats (-)',
+    //   icon: 'chatbubble-ellipses-outline',
+    //   path: 'post',
+    // },
     {
-      text: 'Privat chats (-)',
-      icon: 'chatbubble-ellipses-outline',
-      path: 'post',
+      text: 'Friends',
+      icon: 'people-outline',
+      path: 'Friends',
     },
   ]
 
@@ -63,8 +72,9 @@ export default function ProfileScreen(props) {
     return (
       <Pressable
         onPress={() => {
-          setTemporaryProfileScreen(item.item.path)
-          setModalProfileVisible(true)
+          navigation.navigate(item.item.path)
+          // setTemporaryProfileScreen(item.item.path)
+          // setModalProfileVisible(true)
         }}
         style={({ pressed }) => [
           {
@@ -250,6 +260,7 @@ export default function ProfileScreen(props) {
           <></>
         )}
       </Modal>
+
       {/* <TopProfileBlock /> */}
 
       <View style={styles.postsBlock}>
@@ -260,6 +271,31 @@ export default function ProfileScreen(props) {
         />
       </View>
     </View>
+  )
+}
+
+export default function ProfileScreen() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerShown: false,
+          headerLeft: () => null,
+          // cardStyleInterpolator: forFade,
+        }}
+      />
+      <Stack.Screen
+        name="Friends"
+        component={FriendsListScreen}
+        options={{
+          headerShown: false,
+          headerLeft: () => null,
+          // cardStyleInterpolator: forFade,
+        }}
+      />
+    </Stack.Navigator>
   )
 }
 

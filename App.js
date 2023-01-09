@@ -1,7 +1,10 @@
+import 'react-native-gesture-handler'
 import React, { useState } from 'react'
 import FirstScreen from './screens/FirstScreen'
 import LogInScreen from './screens/LogInScreen'
 import RegistrationScreen from './screens/Registration'
+
+import { NavigationContainer } from '@react-navigation/native'
 
 export default function App() {
   const [status, setStatus] = useState('login')
@@ -15,5 +18,5 @@ export default function App() {
       <FirstScreen onChange={(whereTo) => setStatus(whereTo)} />
     )
 
-  return content
+  return <NavigationContainer>{content}</NavigationContainer>
 }
