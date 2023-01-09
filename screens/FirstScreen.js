@@ -3,19 +3,7 @@ import Header from '../components/Header'
 import Drawer from '../components/Drawer'
 import ProfileScreen from './ProfileScreen'
 import FriendsPosts from './FriendsPosts'
-
-import {
-  getDatabase,
-  get,
-  ref,
-  set,
-  onValue,
-  push,
-  update,
-  remove,
-} from 'firebase/database'
-const database = getDatabase()
-import { auth } from '../firebase-config'
+import FrinedsListScreen from './FriendsListScreen'
 
 export default function FirstScreen(props) {
   const [drawer, setDrawer] = useState(false)
@@ -26,6 +14,7 @@ export default function FirstScreen(props) {
   const screenData = {
     Profile: <ProfileScreen onChange={() => props.onChange('login')} />,
     FriendsPosts: <FriendsPosts />,
+    FrinedsListScreen: <FrinedsListScreen />,
   }
 
   // useEffect(() => {

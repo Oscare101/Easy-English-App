@@ -9,6 +9,7 @@ import {
   Pressable,
   Modal,
   TextInput,
+  ToastAndroid,
 } from 'react-native'
 import { Ionicons, AntDesign } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -25,7 +26,6 @@ import {
   remove,
 } from 'firebase/database'
 const database = getDatabase()
-import { collection, getDocs } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
 import { auth, db } from '../firebase-config'
 import colors from '../constants/colors'
@@ -33,27 +33,24 @@ import SettingsProfile from '../components/SettingsProfile'
 import PostCreator from '../components/PostCreator'
 import getUserTime from '../components/getUserTime'
 
-import { createStackNavigator } from '@react-navigation/stack'
 import FriendsListScreen from './FriendsListScreen'
-const Stack = createStackNavigator()
 
-function Profile({ props, navigation }) {
+function Profile(props) {
   const [userData, setUserData] = useState({})
   const [modalProfileVisible, setModalProfileVisible] = useState(false)
   const [temporaryProfileScreen, setTemporaryProfileScreen] = useState(false)
-
   const dataFlatList = [
-    // { text: 'Create a new post', icon: 'add-circle-outline', path: 'post' },
+    { text: 'Create a new post', icon: 'add-circle-outline', path: 'post' },
     // {
     //   text: 'Privat chats (-)',
     //   icon: 'chatbubble-ellipses-outline',
     //   path: 'post',
     // },
-    {
-      text: 'Friends',
-      icon: 'people-outline',
-      path: 'Friends',
-    },
+    // {
+    //   text: 'Friends',
+    //   icon: 'people-outline',
+    //   path: 'Friends',
+    // },
   ]
 
   function logOut() {
@@ -72,9 +69,8 @@ function Profile({ props, navigation }) {
     return (
       <Pressable
         onPress={() => {
-          navigation.navigate(item.item.path)
-          // setTemporaryProfileScreen(item.item.path)
-          // setModalProfileVisible(true)
+          setTemporaryProfileScreen(item.item.path)
+          setModalProfileVisible(true)
         }}
         style={({ pressed }) => [
           {
@@ -106,6 +102,14 @@ function Profile({ props, navigation }) {
 
   function CheckLike(item) {
     let newLikes = item.likes
+    if (item['author-email'] == auth.currentUser.email) {
+      ToastAndroid.showWithGravity(
+        'You cannot like your own posts',
+        ToastAndroid.BOTTOM,
+        ToastAndroid.LONG
+      )
+      return false
+    }
     if (item.likes.includes(auth.currentUser.email)) {
       newLikes.splice(
         newLikes.findIndex((i) => i == auth.currentUser.email),
@@ -274,28 +278,19 @@ function Profile({ props, navigation }) {
   )
 }
 
-export default function ProfileScreen() {
+export default function ProfileScreen(props) {
+  const [screen, setScreen] = useState('Profile')
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          headerShown: false,
-          headerLeft: () => null,
-          // cardStyleInterpolator: forFade,
-        }}
-      />
-      <Stack.Screen
-        name="Friends"
-        component={FriendsListScreen}
-        options={{
-          headerShown: false,
-          headerLeft: () => null,
-          // cardStyleInterpolator: forFade,
-        }}
-      />
-    </Stack.Navigator>
+    <>
+      {screen == 'Profile' ? (
+        <Profile
+          onChange={(i) => props.onChange(i)}
+          onNewScreen={(i) => setScreen(i)}
+        />
+      ) : (
+        <></>
+      )}
+    </>
   )
 }
 

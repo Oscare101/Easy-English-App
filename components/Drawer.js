@@ -15,6 +15,7 @@ export default function Drawer(props) {
     { text: 'Profile', icon: '', path: 'Profile' },
     // { text: 'Global chats', icon: '' },
     { text: 'Friends posts', icon: '', path: 'FriendsPosts' },
+    { text: 'Friends', icon: '', path: 'FrinedsListScreen' },
   ]
 
   function renderItem(item) {

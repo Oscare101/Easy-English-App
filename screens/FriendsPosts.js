@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  ToastAndroid,
 } from 'react-native'
 import colors from '../constants/colors'
 import getUserTime from '../components/getUserTime'
@@ -37,6 +38,14 @@ export default function FriendsPosts() {
 
   function CheckLike(item) {
     let newLikes = item.likes
+    if (item['author-email'] == auth.currentUser.email) {
+      ToastAndroid.showWithGravity(
+        'You cannot like your own posts',
+        ToastAndroid.BOTTOM,
+        ToastAndroid.LONG
+      )
+      return false
+    }
     if (item.likes.includes(auth.currentUser.email)) {
       newLikes.splice(
         newLikes.findIndex((i) => i == auth.currentUser.email),
