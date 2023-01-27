@@ -144,7 +144,7 @@ function Profile(props) {
   }
 
   function RenderPosts({ item }) {
-    let userTime = getUserTime(item.time)
+    // let userTime = getUserTime(item.time)
 
     return (
       <TouchableOpacity
@@ -154,7 +154,7 @@ function Profile(props) {
         <Text style={styles.postTitle}>{item.title}</Text>
         <Text style={styles.postText}>{item.text}</Text>
         <View style={styles.postBottom}>
-          <Text style={styles.postTime}>{userTime}</Text>
+          <Text style={styles.postTime}>{item.time}</Text>
           <TouchableOpacity
             onPress={() => CheckLike(item)}
             style={styles.postLikesBlock}
@@ -229,7 +229,7 @@ function Profile(props) {
       return (
         <FlatList
           style={{ width: '100%' }}
-          data={item.item}
+          data={item.item.reverse()}
           renderItem={(item) => RenderPosts(item)}
         />
       )

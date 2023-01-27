@@ -40,12 +40,22 @@ export default function PostCreator(props) {
         new Date().getUTCMonth() + 1
       }.${new Date().getUTCFullYear()} ${new Date().getUTCHours()}:${new Date().getUTCMinutes()}`
 
-      let key = `${new Date().getUTCDate()},${
-        new Date().getUTCMonth() + 1
-      },${new Date().getUTCFullYear()}_${new Date().getUTCHours()}:${new Date().getUTCMinutes()}:${new Date().getUTCSeconds()}_${auth.currentUser.email.replace(
-        '.',
-        ','
-      )}`
+      let days = new Date().getUTCDate().toString()
+      let months = (new Date().getUTCMonth() + 1).toString()
+      let hours = new Date().getUTCHours().toString()
+      let minuts = new Date().getUTCMinutes().toString()
+      let seconds = new Date().getUTCSeconds().toString()
+      let miliDeconds = new Date().getUTCMilliseconds().toString()
+
+      let key = `${days.length == 1 ? '0' + days : days},${
+        months.length == 1 ? '0' + months : months
+      },${new Date().getUTCFullYear()}_${
+        hours.length == 1 ? '0' + hours : hours
+      }:${minuts.length == 1 ? '0' + minuts : minuts}:${
+        seconds.length == 1 ? '0' + seconds : seconds
+      }:${
+        miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
+      } ${auth.currentUser.email.replace('.', ',')}`
 
       set(ref(database, 'posts/' + key), {
         key: key,

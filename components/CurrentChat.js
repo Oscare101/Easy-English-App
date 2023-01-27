@@ -23,14 +23,14 @@ const database = getDatabase()
 const textHeight = 18 // fot input
 const numberOfLines = 5 // for input
 
-const data = ['1', '2', '3', '4', '5']
-
 export default function CurrentChat({ navigation }) {
   const [text, setText] = useState('')
   const [height, setHeight] = useState(textHeight * 2)
   const [currentChat, setCurrentChat] = useState()
+  const [userName, setUserName] = useState('')
 
   function createMessage() {
+    // if (text.replace(' ', '')) return false
     let time = `${new Date().getUTCDate()}.${
       new Date().getUTCMonth() + 1
     }.${new Date().getUTCFullYear()} ${new Date().getUTCHours()}:${new Date().getUTCMinutes()}`
@@ -41,7 +41,7 @@ export default function CurrentChat({ navigation }) {
     let minuts = new Date().getUTCMinutes().toString()
     let seconds = new Date().getUTCSeconds().toString()
     let miliDeconds = new Date().getUTCMilliseconds().toString()
-    console.log(miliDeconds)
+
     let key = `${days.length == 1 ? '0' + days : days},${
       months.length == 1 ? '0' + months : months
     },${new Date().getUTCFullYear()}_${
@@ -52,92 +52,57 @@ export default function CurrentChat({ navigation }) {
       miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
     } ${auth.currentUser.email.replace('.', ',')}`
 
-    // const alphabet = [
-    //   'A',
-    //   'B',
-    //   'C',
-    //     'D',
-    //     'E',
-    //     'F',
-    //     'G',
-    //     'H',
-    //     'I',
-    //     'J',
-    //     'K',
-    //     'L',
-    //     'M',
-    //     'N',
-    //     'O',
-    //     'P',
-    //     'Q',
-    //     'R',
-    //     'S',
-    //     'T',
-    //     'U',
-    //     'V',
-    //     'W',
-    //     'X',
-    //     'Y',
-    //     'Z',
-    // ]
-    // let key
-
-    // if (currentChat) {
-    //   let lastKey = Object.values({ ...currentChat })
-    //     .reverse()[0]
-    //     .key.split('_')[0]
-    //   let lastKeyLastLetter = lastKey.split('').reverse()[0]
-
-    //   let indexEnd = alphabet.indexOf(lastKeyLastLetter)
-
-    //   let newLastLetter
-    //   let newKey
-    //   if (indexEnd < alphabet.length - 1) {
-    //     newLastLetter = alphabet[indexEnd + 1]
-    //     newKey = lastKey.split('').reverse().pop() + newLastLetter
-    //     key = `${newKey}_${auth.currentUser.email.replace('.', ',')}`
-    //   } else {
-    //     key = `${lastKey + alphabet[0]}_${auth.currentUser.email.replace(
-    //       '.',
-    //       ','
-    //     )}`
-    //   }
-
-    //   let index = alphabet.indexOf(keyEnd)
-
-    //   let lastKey = Object.values({ ...currentChat })
-    //     .reverse()[0]
-    //     .key.split('_')[0]
-    //   let newKey
-    //   let id =
-    //     Object.values({ ...currentChat }).length > 0
-    //       ? index < 25
-    //               ? (newKey = lastKey.split('')
-    //                 newKey[-1] =
-    //               )
-    //         : lastKey + 'A'
-    //       : alphabet[0]
-    //   key = `${id}_${auth.currentUser.email.replace('.', ',')}`
-    //   console.log(keyEnd, lastKey, newKey)
-    // } else {
-    //   key = `${alphabet[0]}_${auth.currentUser.email.replace('.', ',')}`
-    // }
-
     set(ref(database, `chats/GLOBALCHAT/` + key), {
       key: key,
       time: time,
       'author-email': auth.currentUser.email,
+      'author-name': userName,
+
       text: text,
     })
     setText('')
   }
 
   function renderItem({ item }) {
-    // console.log('===', item)
-    return (
-      <View>
-        <Text>{item.text}</Text>
+    const myMessage = (
+      <View
+        style={[
+          styles.messageItem,
+          {
+            alignSelf: 'flex-end',
+            backgroundColor: '#eef',
+            borderBottomRightRadius: 0,
+          },
+        ]}
+      >
+        <Text style={styles.messageText}>{item.text}</Text>
+        <Text style={styles.messageTime}>{item.time}</Text>
       </View>
+    )
+    const otherMessage = (
+      <View
+        style={[
+          styles.messageItem,
+          {
+            alignSelf: 'flex-start',
+            backgroundColor: '#eee',
+            borderBottomLeftRadius: 0,
+          },
+        ]}
+      >
+        <Text style={styles.messageName}>{item['author-name']}</Text>
+        <Text style={styles.messageText}>{item.text}</Text>
+
+        <Text style={styles.messageTime}>{item.time}</Text>
+      </View>
+    )
+
+    return (
+      <>
+        {item['author-email'] == auth.currentUser.email
+          ? myMessage
+          : otherMessage}
+      </>
     )
   }
 
@@ -146,6 +111,15 @@ export default function CurrentChat({ navigation }) {
     onValue(dataChat, (snapshot) => {
       setCurrentChat(snapshot.val())
       //   console.log(snapshot.val())
+    })
+
+    const dataAboutUser = ref(
+      database,
+      'users/' + auth.currentUser.email.replace('.', ',')
+    )
+    onValue(dataAboutUser, (snapshot) => {
+      setUserName(snapshot.val()['user-name'])
+      // console.log(snapshot.val()['user-name'])
     })
   }, [])
 
@@ -167,10 +141,7 @@ export default function CurrentChat({ navigation }) {
           placeholder="type a message"
           onChangeText={(text) => setText(text)}
           onContentSizeChange={(event) => {
-            const height =
-              Platform.OS === 'ios'
-                ? event.nativeEvent.contentSize.height
-                : event.nativeEvent.contentSize.height - 0
+            const height = event.nativeEvent.contentSize.height + 10
             const lines = Math.round(height / textHeight)
             const visibleLines = lines < numberOfLines ? lines : numberOfLines
             const visibleHeight = textHeight * (visibleLines + 1)
@@ -197,6 +168,30 @@ const styles = StyleSheet.create({
     // flexDirection: 'column',
     // justifyContent: 'flex-end',
   },
+
+  // messages
+
+  messageItem: {
+    width: '80%',
+    backgroundColor: 'red',
+    margin: 5,
+    padding: 10,
+    borderRadius: 5,
+    elevation: 1,
+  },
+  messageName: {
+    fontSize: 14,
+  },
+  messageText: {
+    fontSize: 20,
+  },
+  messageTime: {
+    fontSize: 12,
+    fontWeight: '300',
+  },
+
+  // input
+
   inputBlock: {
     flexDirection: 'row',
     justifyContent: 'space-between',

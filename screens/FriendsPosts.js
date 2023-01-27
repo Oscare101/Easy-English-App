@@ -61,7 +61,7 @@ export default function FriendsPosts() {
     update(
       ref(
         database,
-        `users/${auth.currentUser.email.replace('.', ',')}/posts/` + item.key
+        `users/${item['author-email'].replace('.', ',')}/posts/` + item.key
       ),
       {
         likes: newLikes,
@@ -70,16 +70,16 @@ export default function FriendsPosts() {
   }
 
   function RenderPosts({ item }) {
-    let userTime = getUserTime(item.time)
+    // let userTime = getUserTime(item.time)
     return (
       <TouchableOpacity style={styles.postView}>
         <View>
-          <Text>item</Text>
+          <Text>{item['author-email']}</Text>
         </View>
         <Text style={styles.postTitle}>{item.title}</Text>
         <Text style={styles.postText}>{item.text}</Text>
         <View style={styles.postBottom}>
-          <Text style={styles.postTime}>{userTime}</Text>
+          <Text style={styles.postTime}>{item.time}</Text>
           <TouchableOpacity
             onPress={() => CheckLike(item)}
             style={styles.postLikesBlock}
@@ -96,7 +96,7 @@ export default function FriendsPosts() {
     <View style={styles.container}>
       <FlatList
         style={{ width: '100%' }}
-        data={Object.values({ ...postsData })}
+        data={Object.values({ ...postsData }).reverse()}
         renderItem={RenderPosts}
       />
     </View>
