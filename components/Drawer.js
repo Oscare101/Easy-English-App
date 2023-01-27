@@ -12,10 +12,19 @@ import colors from '../constants/colors'
 
 export default function Drawer(props) {
   const dataFlatList = [
-    { text: 'Profile', icon: '', path: 'Profile' },
+    { text: 'Profile', icon: 'grid-outline', path: 'Profile' },
     // { text: 'Global chats', icon: '' },
-    { text: 'Friends posts', icon: '', path: 'FriendsPosts' },
-    { text: 'Friends', icon: '', path: 'FrinedsListScreen' },
+    { text: 'Friends posts', icon: 'newspaper-outline', path: 'FriendsPosts' },
+    {
+      text: 'Friends',
+      icon: 'people-circle-outline',
+      path: 'FrinedsListScreen',
+    },
+    {
+      text: 'Chat',
+      icon: 'chatbox-ellipses-outline',
+      path: 'GlobalChatScreen',
+    },
   ]
 
   function renderItem(item) {
@@ -97,7 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     marginVertical: 2,
-    padding: 5,
+    padding: 10,
     borderRadius: 10,
     width: '100%',
   },

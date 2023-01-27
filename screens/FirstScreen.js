@@ -4,7 +4,7 @@ import Drawer from '../components/Drawer'
 import ProfileScreen from './ProfileScreen'
 import FriendsPosts from './FriendsPosts'
 import FrinedsListScreen from './FriendsListScreen'
-
+import GlobalChatScreen from './GlobalChatScreen'
 export default function FirstScreen(props) {
   const [drawer, setDrawer] = useState(false)
   const [screen, setScreen] = useState('Profile')
@@ -15,6 +15,7 @@ export default function FirstScreen(props) {
     Profile: <ProfileScreen onChange={() => props.onChange('login')} />,
     FriendsPosts: <FriendsPosts />,
     FrinedsListScreen: <FrinedsListScreen />,
+    GlobalChatScreen: <GlobalChatScreen />,
   }
 
   // useEffect(() => {

@@ -9,6 +9,13 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LinearGradient } from 'expo-linear-gradient'
+import Spinner from 'react-native-loading-spinner-overlay'
+
+import {
+  hasHardwareAsync,
+  isEnrolledAsync,
+  authenticateAsync,
+} from 'expo-local-authentication'
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebase-config'
@@ -21,15 +28,29 @@ export default function LogInScreen(props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
+  const [ifLocalAuthentication, setIfLocalAuthentication] = useState(true) // if user has biometric
+  const [loading, setLoading] = useState(false)
 
-  // useEffect(() => {
-  //   // Call only when screen open or when back on screen
-  //   if (isFocused) {
-  //     GetUser()
-  //   }
-  // }, [isFocused])
+  async function LocalAuthentication(userEmail, userPassword) {
+    const compatible = await hasHardwareAsync()
+    if (!compatible) {
+      setIfLocalAuthentication(false)
+      throw 'This device is not compatible for biometric authentication'
+    }
+    const enrolled = await isEnrolledAsync()
+    if (!enrolled) {
+      setIfLocalAuthentication(false)
+      throw `This device doesn't have biometric authentication enabled`
+    }
+    const result = await authenticateAsync()
+    // if (!result.success) throw `${result.error} - Authentication unsuccessful`
+    if (result.success) login(userEmail, userPassword)
 
-  function login() {
+    return
+  }
+
+  function login(email, password) {
+    setLoading(true)
     signInWithEmailAndPassword(auth, email, password)
       .then(async (re) => {
         await AsyncStorage.setItem('email', email)
@@ -55,6 +76,7 @@ export default function LogInScreen(props) {
       if (getEmail !== null) {
         setEmail(getEmail)
         setPassword(getPassword)
+        LocalAuthentication(getEmail, getPassword)
       }
     } catch (e) {
       console.log(e)
@@ -68,6 +90,13 @@ export default function LogInScreen(props) {
 
   return (
     <View style={styles.container}>
+      <Spinner
+        //visibility of Overlay Loading Spinner
+        visible={loading}
+        //Text with the Spinner
+        textContent={'Loading...'}
+        //Text style of the Spinner Text
+      />
       <View style={styles.header}>
         <View style={styles.line} />
         <Text style={styles.title}>Easy English</Text>
@@ -102,7 +131,7 @@ export default function LogInScreen(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              login()
+              login(email, password)
             }}
             activeOpacity={0.8}
             style={styles.touch}

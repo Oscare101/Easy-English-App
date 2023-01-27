@@ -9,8 +9,9 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LinearGradient } from 'expo-linear-gradient'
+import Spinner from 'react-native-loading-spinner-overlay'
 
-import { collection, addDoc } from 'firebase/firestore'
+// import { collection, addDoc } from 'firebase/firestore'
 // import { getDatabase, get } from 'firebase/database'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth, db } from '../firebase-config'
@@ -35,6 +36,7 @@ export default function RegistrationScreen(props) {
   const [name, setName] = useState('')
   const [uniqueEmailError, setUniqueEmailError] = useState(false)
   const [warningEmail, setWarningEmail] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const [correctPasswordError, setCorrectPasswordError] = useState(false)
   const [nameError, setNameError] = useState(true)
@@ -51,6 +53,7 @@ export default function RegistrationScreen(props) {
   }
 
   function register() {
+    setLoading(true)
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (re) => {
         await AsyncStorage.setItem('email', email.toLowerCase())
@@ -84,6 +87,13 @@ export default function RegistrationScreen(props) {
 
   return (
     <View style={styles.container}>
+      <Spinner
+        //visibility of Overlay Loading Spinner
+        visible={loading}
+        //Text with the Spinner
+        textContent={'Loading...'}
+        //Text style of the Spinner Text
+      />
       <View style={styles.header}>
         <View style={styles.line} />
         <Text style={styles.title}>Easy English</Text>
