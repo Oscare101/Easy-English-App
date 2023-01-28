@@ -407,6 +407,7 @@ function Profile(props) {
         ) : temporaryProfileScreen == 'post' ? (
           <PostCreator
             user={userData}
+            theme={props.theme}
             onClose={() => {
               setModalProfileVisible(false)
               setTemporaryProfileScreen(false)

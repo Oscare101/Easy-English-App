@@ -86,32 +86,79 @@ export default function PostCreator(props) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.block}>
-        <View style={styles.bigBlock}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: props.theme == 'white' ? '#66666699' : '#00000099' },
+      ]}
+    >
+      <View style={[styles.block]}>
+        <View
+          style={[
+            styles.bigBlock,
+            {
+              backgroundColor:
+                props.theme == 'white' ? '#fff' : colors.themeDarkBG,
+            },
+          ]}
+        >
           <TouchableOpacity
             onPress={() => props.onClose()}
             style={styles.closeButton}
           >
-            <Ionicons name="ios-close-outline" size={35} color="black" />
+            <Ionicons
+              name="ios-close-outline"
+              size={35}
+              color={props.theme == 'white' ? colors.dark : colors.white}
+            />
           </TouchableOpacity>
-          <Text style={styles.title}>Create a new post</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: props.theme == 'white' ? colors.dark : colors.white },
+            ]}
+          >
+            Create a new post
+          </Text>
           <View style={styles.contentInput}>
             <View style={styles.contentInputBlock}>
-              <Text>Title:</Text>
+              <Text
+                style={{
+                  color: props.theme == 'white' ? colors.dark : colors.white,
+                }}
+              >
+                Title:
+              </Text>
               <View
                 style={[
                   styles.postItem,
-                  { backgroundColor: colors.buttunActivePale },
+                  {
+                    backgroundColor:
+                      props.theme == 'white'
+                        ? colors.buttunActivePale
+                        : colors.themeDarkBGPale,
+                  },
                 ]}
               >
                 <TextInput
+                  placeholderTextColor={
+                    props.theme == 'white'
+                      ? colors.themeWhiteComment
+                      : colors.themeDarkComment
+                  }
                   blurOnSubmit={true}
                   value={title}
                   placeholder="Title"
                   style={[
                     styles.postText,
-                    { color: '#000', width: '100%', padding: 5 },
+                    {
+                      color:
+                        props.theme == 'white'
+                          ? colors.themeWhiteTextPale
+                          : colors.themeDarkText,
+                      width: '100%',
+                      padding: 5,
+                    },
                   ]}
                   onChangeText={(text) => {
                     setTitle(text)
@@ -119,17 +166,31 @@ export default function PostCreator(props) {
                   }}
                 />
               </View>
-              <Text>Text:</Text>
+              <Text
+                style={{
+                  color: props.theme == 'white' ? colors.dark : colors.white,
+                }}
+              >
+                Text:
+              </Text>
               <View
                 style={[
                   styles.postItem,
                   {
-                    backgroundColor: colors.buttunActivePale,
+                    backgroundColor:
+                      props.theme == 'white'
+                        ? colors.buttunActivePale
+                        : colors.themeDarkBGPale,
                     flex: 1,
                   },
                 ]}
               >
                 <TextInput
+                  placeholderTextColor={
+                    props.theme == 'white'
+                      ? colors.themeWhiteComment
+                      : colors.themeDarkComment
+                  }
                   scrollEnabled={true}
                   editable
                   maxLength={1000}
@@ -143,7 +204,10 @@ export default function PostCreator(props) {
                   style={[
                     styles.postText,
                     {
-                      color: '#000',
+                      color:
+                        props.theme == 'white'
+                          ? colors.themeWhiteTextPale
+                          : colors.themeDarkText,
                       flex: 1,
                       margin: 5,
                     },
@@ -184,7 +248,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#66666699',
   },
   closeButton: {
     position: 'absolute',
@@ -199,7 +262,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   bigBlock: {
-    backgroundColor: '#fff',
     borderRadius: 15,
     padding: 25,
     flex: 1,
@@ -253,6 +315,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.white,
 
     marginTop: 5,
   },

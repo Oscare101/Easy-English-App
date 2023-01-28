@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Text,
   TouchableOpacity,
@@ -7,8 +7,9 @@ import {
   FlatList,
   Pressable,
   Alert,
-  Platform,
   TextInput,
+  Animated,
+  ToastAndroid,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -37,6 +38,9 @@ export default function SettingsProfile(props) {
   const [currentSettings, setCurrentSettings] = useState('main')
   const [name, setName] = useState(props.user['user-name'])
   const [age, setAge] = useState(props.user['user-age'])
+  // const themeAnim = useRef(
+  //   new Animated.Value(theme == 'white' ? 0 : 50)
+  // ).current
 
   function setData(newName, newAge) {
     update(ref(database, 'users/' + auth.currentUser.email.replace('.', ',')), {
@@ -47,7 +51,7 @@ export default function SettingsProfile(props) {
   }
 
   function renderItem({ item }) {
-    console.log(theme)
+    // console.log(theme)
     return (
       <Pressable
         onPress={() => setCurrentSettings(item.path)}
@@ -101,6 +105,17 @@ export default function SettingsProfile(props) {
     )
   }
 
+  function ChangeTheme(value) {
+    //   if (value == theme) return false
+    //   Animated.timing(themeAnim, {
+    //     toValue: value == 'white' ? 50 : 0,
+    //     duration: 200,
+    //     useNativeDriver: false,
+    //   }).start()
+    setTheme(value)
+    props.changeTheme(value)
+  }
+
   function Main() {
     return (
       <>
@@ -134,31 +149,64 @@ export default function SettingsProfile(props) {
               color={theme == 'white' ? colors.dark : colors.white}
             />
           </TouchableOpacity>
-          <View style={styles.themeBlock}>
+          <View
+            style={[
+              styles.themeBlock,
+              {
+                backgroundColor:
+                  theme == 'white'
+                    ? colors.buttunActivePale
+                    : colors.themeDarkBGPale,
+              },
+            ]}
+          >
+            <View
+              style={{
+                marginLeft: theme == 'white' ? '0%' : '50%',
+                position: 'absolute',
+                width: '50%',
+                height: '100%',
+
+                padding: 2,
+              }}
+            >
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderWidth: 1,
+                  borderColor: theme == 'white' ? colors.dark : colors.white,
+                  borderRadius: 8,
+                }}
+              />
+            </View>
+
             <TouchableOpacity
               onPress={() => {
-                setTheme('white')
-                props.changeTheme('white')
+                ChangeTheme('white')
               }}
-              style={[styles.themeButton, { backgroundColor: '#fff' }]}
+              style={[styles.themeButton]}
             >
               <Ionicons
                 name={theme == 'white' ? 'sunny' : 'sunny-outline'}
                 size={24}
-                color="black"
+                color={
+                  theme == 'white' ? colors.dark : colors.themeWhiteComment
+                }
               />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                setTheme('dark')
-                props.changeTheme('dark')
+                ChangeTheme('dark')
               }}
-              style={[styles.themeButton, { backgroundColor: '#3c3f4a' }]}
+              style={[styles.themeButton]}
             >
               <Ionicons
                 name={theme == 'dark' ? 'moon' : 'moon-outline'}
                 size={24}
-                color="#fff"
+                color={
+                  theme == 'white' ? colors.themeDarkComment : colors.white
+                }
               />
             </TouchableOpacity>
           </View>
@@ -214,8 +262,21 @@ export default function SettingsProfile(props) {
 
     // console.log(props)
     return (
-      <View style={styles.bigBlock}>
-        <View style={styles.header}>
+      <View
+        style={[
+          styles.bigBlock,
+          { backgroundColor: theme == 'white' ? '#fff' : colors.themeDarkBG },
+        ]}
+      >
+        <View
+          style={[
+            styles.header,
+            {
+              borderColor:
+                theme == 'white' ? colors.themeWhiteLine : colors.themeDarkLine,
+            },
+          ]}
+        >
           <TouchableOpacity
             onPress={() => {
               setName(newName)
@@ -224,54 +285,136 @@ export default function SettingsProfile(props) {
               setCurrentSettings('main')
             }}
           >
-            <Ionicons name="arrow-back" size={24} color="black" />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={theme == 'white' ? colors.black : colors.white}
+            />
           </TouchableOpacity>
-          <Text style={styles.title}>Personal information</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: theme == 'white' ? colors.black : colors.white },
+            ]}
+          >
+            Personal information
+          </Text>
         </View>
 
-        <Text>Name:</Text>
+        <Text
+          style={{ color: props.theme == 'white' ? colors.dark : colors.white }}
+        >
+          Name:
+        </Text>
         <View
           style={[
             styles.settingItem,
-            { backgroundColor: colors.buttunActivePale, height: 35 },
+            {
+              backgroundColor:
+                theme == 'white'
+                  ? colors.buttunActivePale
+                  : colors.themeDarkBGPale,
+              height: 35,
+            },
           ]}
         >
           <TextInput
+            placeholderTextColor={
+              props.theme == 'white'
+                ? colors.themeWhiteComment
+                : colors.themeDarkComment
+            }
             blurOnSubmit={true}
             value={newName}
             placeholder="name"
-            style={[styles.settingText, { color: '#000', width: '100%' }]}
+            style={[
+              styles.settingText,
+              {
+                color:
+                  theme == 'white'
+                    ? colors.themeWhiteTextPale
+                    : colors.themeDarkText,
+                width: '100%',
+              },
+            ]}
             onChangeText={(text) => setNewName(text)}
           />
         </View>
-        <Text>Email:</Text>
+        <Text
+          style={{ color: props.theme == 'white' ? colors.dark : colors.white }}
+        >
+          Email:
+        </Text>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
-            Alert.alert(
+            ToastAndroid.showWithGravity(
               'You cannot change your email',
-              ''[{ text: 'OK', onPress: () => {} }]
+              ToastAndroid.BOTTOM,
+              ToastAndroid.LONG
             )
           }}
           style={[
             styles.settingItem,
-            { backgroundColor: colors.buttunActivePale, height: 35 },
+            {
+              backgroundColor:
+                theme == 'white'
+                  ? colors.buttunActivePale
+                  : colors.themeDarkBGPale,
+              height: 35,
+            },
           ]}
         >
-          <Text style={styles.settingText}>{props.user['user-email']}</Text>
+          <Text
+            style={[
+              styles.settingText,
+              {
+                color:
+                  theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
+              },
+            ]}
+          >
+            {props.user['user-email']}
+          </Text>
         </TouchableOpacity>
-        <Text>Age:</Text>
+        <Text
+          style={{ color: props.theme == 'white' ? colors.dark : colors.white }}
+        >
+          Age:
+        </Text>
         <View
           style={[
             styles.settingItem,
-            { backgroundColor: colors.buttunActivePale, height: 35 },
+            {
+              backgroundColor:
+                theme == 'white'
+                  ? colors.buttunActivePale
+                  : colors.themeDarkBGPale,
+              height: 35,
+            },
           ]}
         >
           <TextInput
+            placeholderTextColor={
+              props.theme == 'white'
+                ? colors.themeWhiteComment
+                : colors.themeDarkComment
+            }
             value={newAge}
             placeholder="age"
             keyboardType="number-pad"
-            style={[styles.settingText, { color: '#000', width: '100%' }]}
+            style={[
+              styles.settingText,
+              {
+                color:
+                  theme == 'white'
+                    ? colors.themeWhiteTextPale
+                    : colors.themeDarkText,
+                width: '100%',
+              },
+            ]}
             onChangeText={(num) => setNewAge(num)}
           />
         </View>
@@ -280,7 +423,14 @@ export default function SettingsProfile(props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme == 'white' ? '#66666699' : `#00000099`,
+        },
+      ]}
+    >
       <View style={styles.block}>
         {currentSettings == 'main' ? <Main /> : <Personal user={props.user} />}
       </View>
@@ -292,7 +442,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#66666699',
   },
   block: {
     width: '80%',
@@ -329,7 +478,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#eee',
+
     paddingBottom: 10,
     marginBottom: 10,
   },
