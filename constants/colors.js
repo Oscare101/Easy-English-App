@@ -27,10 +27,12 @@ export default {
   themeWhiteText: '#000',
   themeWhiteTextPale: '#232325',
   themeWhiteComment: '#6D6C73',
+  themeWhiteLine: '#E9E9E9',
 
   themeDarkBG: '#2F3136',
   themeDarkBGPale: '#36393F',
   themeDarkText: '#fff',
   themeDarkTextPale: '#B9BABC',
   themeDarkComment: '#B9BABC',
+  themeDarkLine: '#3D4148',
 }

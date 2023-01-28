@@ -66,16 +66,22 @@ function Profile(props) {
       })
   }
 
-  function renderItem(item) {
+  function renderItem({ item }) {
     return (
       <Pressable
         onPress={() => {
-          setTemporaryProfileScreen(item.item.path)
+          setTemporaryProfileScreen(item.path)
           setModalProfileVisible(true)
         }}
         style={({ pressed }) => [
           {
-            backgroundColor: pressed ? colors.buttunActivePale : '#fff',
+            backgroundColor: pressed
+              ? props.theme == 'white'
+                ? colors.buttunActivePale
+                : colors.themeDarkBG
+              : props.theme == 'white'
+              ? colors.themeWhiteBG
+              : colors.themeDarkBGPale,
           },
           styles.underProfileItem,
         ]}
@@ -83,17 +89,33 @@ function Profile(props) {
         {({ pressed }) => (
           <>
             <Ionicons
-              name={item.item.icon}
+              name={item.icon}
               size={30}
-              color={pressed ? '#232325' : '#6D6C73'}
+              color={
+                pressed
+                  ? props.theme == 'white'
+                    ? colors.themeWhiteTextPale
+                    : colors.themeDarkTextPale
+                  : props.theme == 'white'
+                  ? colors.themeWhiteComment
+                  : colors.themeDarkComment
+              }
             />
             <Text
               style={[
                 styles.underProfileText,
-                { color: pressed ? '#232325' : '#6D6C73' },
+                {
+                  color: pressed
+                    ? props.theme == 'white'
+                      ? colors.themeWhiteTextPale
+                      : colors.themeDarkText
+                    : props.theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
+                },
               ]}
             >
-              {item.item.text}
+              {item.text}
             </Text>
           </>
         )}
@@ -163,18 +185,65 @@ function Profile(props) {
             },
           ])
         }}
-        style={styles.postView}
+        style={[
+          styles.postView,
+          {
+            borderColor:
+              props.theme == 'white'
+                ? colors.themeWhiteLine
+                : colors.themeDarkLine,
+          },
+        ]}
       >
-        <Text style={styles.postTitle}>{item.title}</Text>
-        <Text style={styles.postText}>{item.text}</Text>
+        <Text
+          style={[
+            styles.postTitle,
+            { color: props.theme == 'white' ? colors.dark : colors.white },
+          ]}
+        >
+          {item.title}
+        </Text>
+        <Text
+          style={[
+            styles.postText,
+            { color: props.theme == 'white' ? colors.dark : colors.white },
+          ]}
+        >
+          {item.text}
+        </Text>
         <View style={styles.postBottom}>
-          <Text style={styles.postTime}>{item.time}</Text>
+          <Text
+            style={[
+              styles.postTime,
+              {
+                color:
+                  props.theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
+              },
+            ]}
+          >
+            {item.time}
+          </Text>
           <TouchableOpacity
             onPress={() => CheckLike(item)}
             style={styles.postLikesBlock}
           >
-            <Text style={styles.postLikes}>{item.likes.length - 1}</Text>
-            <Ionicons name="md-heart-outline" size={20} color="black" />
+            <Text
+              style={[
+                styles.postLikes,
+                {
+                  color: props.theme == 'white' ? colors.dark : colors.white,
+                },
+              ]}
+            >
+              {item.likes.length - 1}
+            </Text>
+            <Ionicons
+              name="md-heart-outline"
+              size={20}
+              color={props.theme == 'white' ? colors.dark : colors.white}
+            />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -193,15 +262,54 @@ function Profile(props) {
 
   function TopProfileBlock() {
     return (
-      <View style={styles.profileBlock}>
-        <View style={styles.personBlock}>
+      <View
+        style={[
+          styles.profileBlock,
+          {
+            backgroundColor:
+              props.theme == 'white'
+                ? colors.themeWhiteBGPale
+                : colors.themeDarkBGPale,
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.personBlock,
+            {
+              borderColor:
+                props.theme == 'white'
+                  ? colors.themeWhiteLine
+                  : colors.themeDarkLine,
+            },
+          ]}
+        >
           <Image
             source={require('../constants/user.png')}
             style={{ width: 70, height: 70 }}
           />
           <View style={styles.nameBlock}>
-            <Text style={styles.name}>{userData['user-name']}</Text>
-            <Text style={styles.email}>
+            <Text
+              style={[
+                styles.name,
+                {
+                  color: props.theme == 'white' ? colors.black : colors.white,
+                },
+              ]}
+            >
+              {userData['user-name']}
+            </Text>
+            <Text
+              style={[
+                styles.email,
+                {
+                  color:
+                    props.theme == 'white'
+                      ? colors.themeWhiteComment
+                      : colors.themeDarkComment,
+                },
+              ]}
+            >
               {auth.currentUser.email}
               {auth.currentUser.metadata.lastSignInTime
                 .split(' ')
@@ -216,9 +324,33 @@ function Profile(props) {
             }}
             style={styles.botBlock}
           >
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
+            <View
+              style={[
+                styles.dot,
+                {
+                  backgroundColor:
+                    props.theme == 'white' ? colors.dark : colors.white,
+                },
+              ]}
+            />
+            <View
+              style={[
+                styles.dot,
+                {
+                  backgroundColor:
+                    props.theme == 'white' ? colors.dark : colors.white,
+                },
+              ]}
+            />
+            <View
+              style={[
+                styles.dot,
+                {
+                  backgroundColor:
+                    props.theme == 'white' ? colors.dark : colors.white,
+                },
+              ]}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.underProfileBlock}>
@@ -247,7 +379,15 @@ function Profile(props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            props.theme == 'white' ? colors.themeWhiteBG : colors.themeDarkBG,
+        },
+      ]}
+    >
       <Modal
         visible={modalProfileVisible}
         transparent={true}
@@ -331,7 +471,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#E9E9E9',
+
     padding: 20,
     height: 100,
   },

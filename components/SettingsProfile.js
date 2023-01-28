@@ -46,11 +46,13 @@ export default function SettingsProfile(props) {
     })
   }
 
-  function renderItem(item) {
+  function renderItem({ item }) {
+    console.log(theme)
     return (
       <Pressable
-        onPress={() => setCurrentSettings(item.item.path)}
+        onPress={() => setCurrentSettings(item.path)}
         style={({ pressed }) => [
+          styles.settingItem,
           {
             backgroundColor: pressed
               ? theme == 'white'
@@ -60,20 +62,19 @@ export default function SettingsProfile(props) {
               ? colors.themeWhiteBG
               : colors.themeDarkBG,
           },
-          styles.settingItem,
         ]}
       >
         {({ pressed }) => (
           <>
             <Ionicons
-              name={item.item.icon}
+              name={item.icon}
               size={30}
               color={
                 pressed
-                  ? theme == 'white'
+                  ? props.theme == 'white'
                     ? colors.themeWhiteTextPale
                     : colors.themeDarkTextPale
-                  : theme == 'white'
+                  : props.theme == 'white'
                   ? colors.themeWhiteComment
                   : colors.themeDarkComment
               }
@@ -83,16 +84,16 @@ export default function SettingsProfile(props) {
                 styles.settingText,
                 {
                   color: pressed
-                    ? theme == 'white'
+                    ? props.theme == 'white'
                       ? colors.themeWhiteTextPale
                       : colors.themeDarkText
-                    : theme == 'white'
+                    : props.theme == 'white'
                     ? colors.themeWhiteComment
                     : colors.themeDarkComment,
                 },
               ]}
             >
-              {item.item.text}
+              {item.text}
             </Text>
           </>
         )}
