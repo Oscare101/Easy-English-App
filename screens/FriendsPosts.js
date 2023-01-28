@@ -85,7 +85,15 @@ export default function FriendsPosts() {
             style={styles.postLikesBlock}
           >
             <Text style={styles.postLikes}>{item.likes.length - 1}</Text>
-            <AntDesign name="like2" size={24} color="black" />
+            <Ionicons
+              name={
+                item.likes.includes(auth.currentUser.email)
+                  ? 'md-heart'
+                  : 'md-heart-outline'
+              }
+              size={20}
+              color="black"
+            />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -145,14 +153,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
+    padding: 5,
     paddingHorizontal: 15,
     borderRadius: 50,
-    borderWidth: 1,
-    borderColor: colors.buttunActivePale,
+    // borderWidth: 1,
+    // borderColor: colors.buttunActivePale,
   },
   postLikes: {
-    fontSize: 20,
+    fontSize: 18,
     marginRight: 10,
+    fontWeight: '300',
   },
 })

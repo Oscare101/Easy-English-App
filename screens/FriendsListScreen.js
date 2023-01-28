@@ -24,7 +24,7 @@ export default function FriendsListScreen() {
     )
     onValue(dataAboutUser, (snapshot) => {
       setUserData(snapshot.val())
-      console.log('===', snapshot.val().friends)
+      // console.log('===', snapshot.val().friends)
     })
   }, [])
 

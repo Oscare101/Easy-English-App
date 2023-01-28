@@ -4,13 +4,12 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  TouchableHighlight,
   FlatList,
   Pressable,
   Modal,
-  TextInput,
   ToastAndroid,
   Image,
+  Alert,
 } from 'react-native'
 import { Ionicons, AntDesign } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -149,7 +148,20 @@ function Profile(props) {
 
     return (
       <TouchableOpacity
-        onLongPress={() => Delete(item.key)}
+        onLongPress={() => {
+          Alert.alert('Delete', 'Are you sure you want to delete this post?', [
+            {
+              text: 'Cancel',
+              onPress: () => {},
+              style: 'cancel',
+            },
+            {
+              text: 'Delete',
+              onPress: () => Delete(item.key),
+              style: 'cancel',
+            },
+          ])
+        }}
         style={styles.postView}
       >
         <Text style={styles.postTitle}>{item.title}</Text>
@@ -161,7 +173,7 @@ function Profile(props) {
             style={styles.postLikesBlock}
           >
             <Text style={styles.postLikes}>{item.likes.length - 1}</Text>
-            <AntDesign name="like2" size={24} color="black" />
+            <Ionicons name="md-heart-outline" size={20} color="black" />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -405,14 +417,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
+    padding: 5,
     paddingHorizontal: 15,
     borderRadius: 50,
-    borderWidth: 1,
-    borderColor: colors.buttunActivePale,
+    // borderWidth: 1,
+    // borderColor: colors.buttunActivePale,
   },
   postLikes: {
-    fontSize: 20,
+    fontSize: 18,
     marginRight: 10,
+    fontWeight: '300',
   },
 })
