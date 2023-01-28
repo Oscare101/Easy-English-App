@@ -18,12 +18,13 @@ import {
   push,
   update,
 } from 'firebase/database'
+import colors from '../constants/colors'
 const database = getDatabase()
 
 const textHeight = 18 // fot input
 const numberOfLines = 5 // for input
 
-export default function CurrentChat({ navigation }) {
+export default function QuestionsChat({ navigation }) {
   const [text, setText] = useState('')
   const [height, setHeight] = useState(textHeight * 2)
   const [currentChat, setCurrentChat] = useState()
@@ -52,7 +53,7 @@ export default function CurrentChat({ navigation }) {
       miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
     } ${auth.currentUser.email.replace('.', ',')}`
 
-    set(ref(database, `chats/GLOBALCHAT/` + key), {
+    set(ref(database, `chats/QUESTIONSCHAT/` + key), {
       key: key,
       time: time,
       'author-email': auth.currentUser.email,
@@ -70,7 +71,7 @@ export default function CurrentChat({ navigation }) {
           styles.messageItem,
           {
             alignSelf: 'flex-end',
-            backgroundColor: '#eef',
+            backgroundColor: `${colors.greenPale}66`,
             borderBottomRightRadius: 0,
           },
         ]}
@@ -85,7 +86,7 @@ export default function CurrentChat({ navigation }) {
           styles.messageItem,
           {
             alignSelf: 'flex-start',
-            backgroundColor: '#eee',
+            backgroundColor: `${colors.bluePale}66`,
             borderBottomLeftRadius: 0,
           },
         ]}
@@ -107,7 +108,7 @@ export default function CurrentChat({ navigation }) {
   }
 
   useEffect(() => {
-    const dataChat = ref(database, `chats/GLOBALCHAT`)
+    const dataChat = ref(database, `chats/QUESTIONSCHAT`)
     onValue(dataChat, (snapshot) => {
       setCurrentChat(snapshot.val())
       //   console.log(snapshot.val())
@@ -177,7 +178,6 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderRadius: 5,
-    elevation: 1,
   },
   messageName: {
     fontSize: 14,
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 5,
     alignItems: 'center',
+    backgroundColor: `${colors.greenPale}33`,
   },
   input: {
     flex: 1,

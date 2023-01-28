@@ -6,63 +6,133 @@ import {
   TouchableOpacity,
   Pressable,
   FlatList,
+  ScrollView,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import colors from '../constants/colors'
 
 export default function Drawer(props) {
   const dataFlatList = [
-    { text: 'Profile', icon: 'grid-outline', path: 'Profile' },
-    // { text: 'Global chats', icon: '' },
-    { text: 'Friends posts', icon: 'newspaper-outline', path: 'FriendsPosts' },
+    { type: 'profile', text: 'Profile', icon: 'grid-outline', path: 'Profile' },
     {
+      type: 'profile',
+      text: 'Friends posts',
+      icon: 'newspaper-outline',
+      path: 'FriendsPosts',
+    },
+    {
+      type: 'profile',
       text: 'Friends',
       icon: 'people-circle-outline',
       path: 'FrinedsListScreen',
     },
     {
+      type: 'profile',
       text: 'Chat',
       icon: 'chatbox-ellipses-outline',
       path: 'GlobalChatScreen',
     },
+    { type: 'line' },
+    {
+      type: 'lesson',
+      text: 'Theory',
+      icon: 'book-outline',
+      path: 'Theory',
+      activeBG: colors.redPale,
+      activeColor: colors.redActivePale,
+    },
+    {
+      type: 'lesson',
+      text: 'Tests',
+      icon: 'ios-shield-checkmark-outline',
+      path: 'Tests',
+      activeBG: colors.bluePale,
+      activeColor: colors.blueActivePale,
+    },
+    {
+      type: 'lesson',
+      text: 'Certificates',
+      icon: 'star-outline',
+      path: 'Certificates',
+      activeBG: colors.greenPale,
+      activeColor: colors.greenActivePale,
+    },
+    { type: 'line' },
   ]
 
-  function renderItem(item) {
-    return (
-      <Pressable
-        onPress={() => props.setScreen(item.item.path)}
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed ? colors.buttunActivePale : '#fff',
-          },
-          styles.underProfileItem,
-        ]}
-      >
-        {({ pressed }) => (
-          <>
-            <Ionicons
-              name={item.item.icon}
-              size={30}
-              color={pressed ? '#232325' : '#6D6C73'}
-            />
-            <Text
-              style={[
-                styles.underProfileText,
-                { color: pressed ? '#232325' : '#6D6C73' },
-              ]}
-            >
-              {item.item.text}
-            </Text>
-          </>
-        )}
-      </Pressable>
-    )
+  function renderItem({ item }) {
+    if (item.type == 'profile') {
+      return (
+        <Pressable
+          onPress={() => props.setScreen(item.path)}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? colors.buttunActivePale : '#fff',
+            },
+            styles.underProfileItem,
+          ]}
+        >
+          {({ pressed }) => (
+            <>
+              <Ionicons
+                name={item.icon}
+                size={30}
+                color={pressed ? '#232325' : '#76808a'}
+              />
+              <Text
+                style={[
+                  styles.underProfileText,
+                  { color: pressed ? '#232325' : '#76808a' },
+                ]}
+              >
+                {item.text}
+              </Text>
+            </>
+          )}
+        </Pressable>
+      )
+    } else if (item.type == 'line') {
+      return <View style={styles.line} />
+    } else if (item.type == 'lesson') {
+      return (
+        <Pressable
+          onPress={() => props.setScreen(item.path)}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? item.activeBG : '#fff',
+            },
+            styles.underProfileItem,
+          ]}
+        >
+          {({ pressed }) => (
+            <>
+              <Ionicons
+                name={item.icon}
+                size={30}
+                color={pressed ? item.activeColor : `${item.activeColor}bb`}
+              />
+              <Text
+                style={[
+                  styles.underProfileText,
+                  {
+                    color: pressed ? item.activeColor : `${item.activeColor}bb`,
+                  },
+                ]}
+              >
+                {item.text}
+              </Text>
+            </>
+          )}
+        </Pressable>
+      )
+    }
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.underProfileBlock}>
         <FlatList
+          showsVerticalScrollIndicator={false}
           style={{ width: '100%' }}
           data={dataFlatList}
           renderItem={renderItem}
@@ -112,7 +182,15 @@ const styles = StyleSheet.create({
   },
   underProfileText: {
     fontSize: 20,
-    color: '#6D6C73',
+    color: '#79768a',
     marginLeft: 10,
+  },
+
+  line: {
+    width: '100%',
+    height: 2,
+    borderRadius: 5,
+    backgroundColor: '#aaa',
+    marginVertical: 10,
   },
 })

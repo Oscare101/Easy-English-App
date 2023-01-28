@@ -11,4 +11,13 @@ export default {
 
   red: '#f00',
   yellow: '#e38819',
+
+  redPale: '#e6bebe',
+  redActivePale: '#783d3d',
+  bluePale: '#a9b1db',
+  blueActivePale: '#384170',
+  greenPale: '#abdbb4',
+  greenActivePale: '#325e3a',
+  purplePale: '#caa9db',
+  purpleActivePale: '#5b3870',
 }

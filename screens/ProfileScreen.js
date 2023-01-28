@@ -10,6 +10,7 @@ import {
   Modal,
   TextInput,
   ToastAndroid,
+  Image,
 } from 'react-native'
 import { Ionicons, AntDesign } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -181,13 +182,9 @@ function Profile(props) {
     return (
       <View style={styles.profileBlock}>
         <View style={styles.personBlock}>
-          <View
-            style={{
-              width: 70,
-              height: 70,
-              borderRadius: 50,
-              backgroundColor: '#666',
-            }}
+          <Image
+            source={require('../constants/user.png')}
+            style={{ width: 70, height: 70 }}
           />
           <View style={styles.nameBlock}>
             <Text style={styles.name}>{userData['user-name']}</Text>
