@@ -33,6 +33,7 @@ const dataFlatList = [
 ]
 
 export default function SettingsProfile(props) {
+  const [theme, setTheme] = useState(props.theme)
   const [currentSettings, setCurrentSettings] = useState('main')
   const [name, setName] = useState(props.user['user-name'])
   const [age, setAge] = useState(props.user['user-age'])
@@ -51,7 +52,13 @@ export default function SettingsProfile(props) {
         onPress={() => setCurrentSettings(item.item.path)}
         style={({ pressed }) => [
           {
-            backgroundColor: pressed ? colors.buttunActivePale : '#fff',
+            backgroundColor: pressed
+              ? theme == 'white'
+                ? colors.buttunActivePale
+                : colors.themeDarkBGPale
+              : theme == 'white'
+              ? colors.themeWhiteBG
+              : colors.themeDarkBG,
           },
           styles.settingItem,
         ]}
@@ -61,12 +68,28 @@ export default function SettingsProfile(props) {
             <Ionicons
               name={item.item.icon}
               size={30}
-              color={pressed ? '#232325' : '#6D6C73'}
+              color={
+                pressed
+                  ? theme == 'white'
+                    ? colors.themeWhiteTextPale
+                    : colors.themeDarkTextPale
+                  : theme == 'white'
+                  ? colors.themeWhiteComment
+                  : colors.themeDarkComment
+              }
             />
             <Text
               style={[
                 styles.settingText,
-                { color: pressed ? '#232325' : '#6D6C73' },
+                {
+                  color: pressed
+                    ? theme == 'white'
+                      ? colors.themeWhiteTextPale
+                      : colors.themeDarkText
+                    : theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
+                },
               ]}
             >
               {item.item.text}
@@ -80,8 +103,20 @@ export default function SettingsProfile(props) {
   function Main() {
     return (
       <>
-        <View style={styles.settingsMenuBlock}>
-          <Text style={styles.title}>Settings</Text>
+        <View
+          style={[
+            styles.settingsMenuBlock,
+            { backgroundColor: theme == 'white' ? '#fff' : colors.themeDarkBG },
+          ]}
+        >
+          <Text
+            style={[
+              styles.title,
+              { color: theme == 'white' ? colors.dark : colors.white },
+            ]}
+          >
+            Settings
+          </Text>
 
           <FlatList
             style={{ width: '100%' }}
@@ -92,11 +127,48 @@ export default function SettingsProfile(props) {
             onPress={() => props.onClose()}
             style={styles.closeButton}
           >
-            <Ionicons name="ios-close-outline" size={35} color="black" />
+            <Ionicons
+              name="ios-close-outline"
+              size={35}
+              color={theme == 'white' ? colors.dark : colors.white}
+            />
           </TouchableOpacity>
+          <View style={styles.themeBlock}>
+            <TouchableOpacity
+              onPress={() => {
+                setTheme('white')
+                props.changeTheme('white')
+              }}
+              style={[styles.themeButton, { backgroundColor: '#fff' }]}
+            >
+              <Ionicons
+                name={theme == 'white' ? 'sunny' : 'sunny-outline'}
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setTheme('dark')
+                props.changeTheme('dark')
+              }}
+              style={[styles.themeButton, { backgroundColor: '#3c3f4a' }]}
+            >
+              <Ionicons
+                name={theme == 'dark' ? 'moon' : 'moon-outline'}
+                size={24}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.logOutBlock}>
+        <View
+          style={[
+            styles.logOutBlock,
+            { backgroundColor: theme == 'white' ? '#fff' : colors.themeDarkBG },
+          ]}
+        >
           <LinearGradient
             // Button Linear Gradient
 
@@ -116,7 +188,17 @@ export default function SettingsProfile(props) {
               <Text style={styles.buttonLogOutText}>Log Out</Text>
             </TouchableOpacity>
           </LinearGradient>
-          <Text style={styles.comment}>
+          <Text
+            style={[
+              styles.comment,
+              {
+                color:
+                  theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
+              },
+            ]}
+          >
             All your data is stored on the server. You can log into your account
             at any time
           </Text>
@@ -218,7 +300,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   settingsMenuBlock: {
-    backgroundColor: '#fff',
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     borderRadius: 5,
@@ -255,7 +336,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 110,
     marginTop: 5,
-    backgroundColor: '#fff',
     borderBottomRightRadius: 15,
     borderBottomLeftRadius: 15,
     borderRadius: 5,
@@ -272,6 +352,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 5,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
   buttonLogOutText: {
     color: '#fff',
@@ -304,5 +386,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#6D6C73',
     marginLeft: 10,
+  },
+
+  // theme
+
+  themeBlock: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#666',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  themeButton: {
+    width: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
   },
 })

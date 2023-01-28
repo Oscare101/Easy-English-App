@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
 } from 'react-native'
+import colors from '../constants/colors'
 
 export default function Header(props) {
   const [headerStatus, setHeaderStatus] = useState(false)
@@ -58,7 +59,14 @@ export default function Header(props) {
   }, [props.drawer])
 
   return (
-    <View style={styles.header}>
+    <View
+      style={[
+        styles.header,
+        {
+          backgroundColor: props.theme == 'white' ? '#fff' : colors.themeDarkBG,
+        },
+      ]}
+    >
       <StatusBar />
       <TouchableOpacity
         activeOpacity={0.8}
@@ -73,13 +81,25 @@ export default function Header(props) {
                 position: 'absolute',
                 top: moveAnim,
                 transform: [{ rotateZ: topRotation }],
+                backgroundColor:
+                  props.theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
               },
             ]}
           />
           <Animated.View
             style={[
               styles.burgerButtonLine,
-              { position: 'absolute', top: 10, opacity: fadeAnim },
+              {
+                position: 'absolute',
+                top: 10,
+                opacity: fadeAnim,
+                backgroundColor:
+                  props.theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
+              },
             ]}
           />
           <Animated.View
@@ -89,12 +109,23 @@ export default function Header(props) {
                 position: 'absolute',
                 bottom: moveAnim,
                 transform: [{ rotateZ: bottomRotation }],
+                backgroundColor:
+                  props.theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment,
               },
             ]}
           />
         </View>
       </TouchableOpacity>
-      <Text style={styles.title}>Easy English</Text>
+      <Text
+        style={[
+          styles.title,
+          { color: props.theme == 'white' ? colors.dark : colors.white },
+        ]}
+      >
+        Easy English
+      </Text>
       <Text>icon</Text>
     </View>
   )
@@ -104,7 +135,6 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     height: 80,
-    backgroundColor: '#fff',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

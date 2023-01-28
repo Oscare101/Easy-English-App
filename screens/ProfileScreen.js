@@ -36,6 +36,7 @@ import getUserTime from '../components/getUserTime'
 import FriendsListScreen from './FriendsListScreen'
 
 function Profile(props) {
+  const [theme, setTheme] = useState(props.theme)
   const [userData, setUserData] = useState({})
   const [modalProfileVisible, setModalProfileVisible] = useState(false)
   const [temporaryProfileScreen, setTemporaryProfileScreen] = useState(false)
@@ -255,6 +256,8 @@ function Profile(props) {
         {temporaryProfileScreen == 'settings' ? (
           <SettingsProfile
             user={userData}
+            theme={props.theme}
+            changeTheme={props.changeTheme}
             onLogOut={() => logOut()}
             onClose={() => {
               setModalProfileVisible(false)
@@ -293,6 +296,8 @@ export default function ProfileScreen(props) {
     <>
       {screen == 'Profile' ? (
         <Profile
+          theme={props.theme}
+          changeTheme={props.changeTheme}
           onChange={(i) => props.onChange(i)}
           onNewScreen={(i) => setScreen(i)}
         />
