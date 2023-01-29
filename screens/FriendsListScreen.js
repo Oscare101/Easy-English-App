@@ -29,7 +29,7 @@ export default function FriendsListScreen() {
   }, [])
 
   function renderFriends(friends) {
-    console.log(friends)
+    // console.log(friends)
     return (
       <View>
         <Text>yujk</Text>

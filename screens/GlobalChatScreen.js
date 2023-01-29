@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Pressable,
 } from 'react-native'
 import MainChat from '../components/MainChat'
 import {
@@ -28,34 +29,78 @@ const timingConfig = {
 const chatsListData = [
   {
     name: 'Main Global Chat',
-    color: colors.purpleActivePale,
-    bgColor: colors.purplePale,
+    activeBG: colors.purplePale,
+    activeColor: colors.purpleActivePale,
+    darBG: colors.darkPurple,
+    darkActive: colors.darkPurpleActive,
+
     path: 'MainChat',
   },
   {
     name: 'Questions Chat',
-    color: colors.greenActivePale,
-    bgColor: colors.greenPale,
+    activeBG: colors.greenPale,
+    activeColor: colors.greenActivePale,
+    darBG: colors.darkGreen,
+    darkActive: colors.darkGreenActive,
     path: 'QuestionsChat',
   },
 ]
 
-function ChatsList({ navigation }) {
+function ChatsList(props) {
   function renderItem({ item }) {
     return (
-      <TouchableOpacity
-        style={[styles.chatButton, { borderColor: item.bgColor }]}
-        onPress={() => navigation.navigate(item.path)}
+      <Pressable
+        style={({ pressed }) => [
+          styles.chatButton,
+          {
+            borderColor: pressed
+              ? props.theme == 'white'
+                ? `${item.activeColor}`
+                : item.darkActive
+              : props.theme == 'white'
+              ? `${item.activeColor}`
+              : `${item.darkActive}99`,
+            backgroundColor: pressed
+              ? props.theme == 'white'
+                ? item.activeBG
+                : `${item.darBG}33`
+              : '#ffffff00',
+          },
+        ]}
+        onPress={() => props.onChangeChat(item.path)}
       >
-        <Text style={[styles.chatTitle, { color: item.color }]}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
+        {({ pressed }) => (
+          <Text
+            style={[
+              styles.chatTitle,
+              {
+                color: pressed
+                  ? props.theme == 'white'
+                    ? `${item.activeColor}`
+                    : item.darkActive
+                  : props.theme == 'white'
+                  ? `${item.activeColor}`
+                  : `${item.darkActive}99`,
+              },
+            ]}
+          >
+            {item.name}
+          </Text>
+        )}
+      </Pressable>
     )
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            props.theme == 'white' ? colors.themeWhiteBG : colors.themeDarkBG,
+        },
+      ]}
+    >
       <View style={styles.commentBlock}>
         <Text style={styles.commentText}>
           Be careful in global chats. Do not insult other users, do not share
@@ -71,12 +116,43 @@ function ChatsList({ navigation }) {
   )
 }
 
-export default function GlobalChatScreen() {
+export default function GlobalChatScreen(props) {
+  function ChatsListBuf({ navigation }) {
+    return (
+      <ChatsList
+        theme={props.theme}
+        onChangeChat={(path) => navigation.navigate(path)}
+      />
+    )
+  }
+
+  function MainChatBuf({ navigation }) {
+    return (
+      <MainChat
+        myMessageColor={colors.purplePale}
+        DBPath="GLOBALCHAT"
+        theme={props.theme}
+        onChangeChat={(path) => navigation.navigate(path)}
+      />
+    )
+  }
+
+  function QuestionsChatBuf({ navigation }) {
+    return (
+      <MainChat
+        myMessageColor={colors.greenPale}
+        DBPath="QUESTIONSCHAT"
+        theme={props.theme}
+        onChangeChat={(path) => navigation.navigate(path)}
+      />
+    )
+  }
+
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="ChatsList"
-        component={ChatsList}
+        component={ChatsListBuf}
         options={{
           headerShown: false,
           //   headerLeft: () => null,
@@ -84,7 +160,7 @@ export default function GlobalChatScreen() {
       />
       <Stack.Screen
         name="MainChat"
-        component={MainChat}
+        component={MainChatBuf}
         options={{
           headerShown: false,
           headerLeft: () => null,
@@ -100,7 +176,7 @@ export default function GlobalChatScreen() {
       />
       <Stack.Screen
         name="QuestionsChat"
-        component={QuestionsChat}
+        component={QuestionsChatBuf}
         options={{
           headerShown: false,
           headerLeft: () => null,

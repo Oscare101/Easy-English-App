@@ -22,6 +22,15 @@ export default {
   purplePale: '#caa9db',
   purpleActivePale: '#5b3870',
 
+  darkRed: '#ab7e7e',
+  darkRedActive: '#eb8686',
+  darkBlue: '#7d81a8',
+  darkBlueActive: '#8698eb',
+  darkGreen: '#7da883',
+  darkGreenActive: '#8deb86',
+  darkPurple: '#9e7da8',
+  darkPurpleActive: '#e386eb',
+
   themeWhiteBG: '#fff',
   themeWhiteBGPale: '#fff',
   themeWhiteText: '#000',

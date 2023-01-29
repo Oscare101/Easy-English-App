@@ -37,9 +37,9 @@ export default function FirstScreen(props) {
         }}
       />
     ),
-    FriendsPosts: <FriendsPosts />,
-    FrinedsListScreen: <FrinedsListScreen />,
-    GlobalChatScreen: <GlobalChatScreen />,
+    FriendsPosts: <FriendsPosts theme={theme} />,
+    FrinedsListScreen: <FrinedsListScreen theme={theme} />,
+    GlobalChatScreen: <GlobalChatScreen theme={theme} />,
   }
 
   // useEffect(() => {
@@ -55,6 +55,7 @@ export default function FirstScreen(props) {
 
       {drawer ? (
         <Drawer
+          theme={theme}
           setScreen={(i) => {
             setScreen(i)
             setDrawer(false)

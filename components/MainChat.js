@@ -24,7 +24,7 @@ const database = getDatabase()
 const textHeight = 18 // fot input
 const numberOfLines = 5 // for input
 
-export default function MainChat({ navigation }) {
+export default function MainChat(props) {
   const [text, setText] = useState('')
   const [height, setHeight] = useState(textHeight * 2)
   const [currentChat, setCurrentChat] = useState()
@@ -53,7 +53,7 @@ export default function MainChat({ navigation }) {
       miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
     } ${auth.currentUser.email.replace('.', ',')}`
 
-    set(ref(database, `chats/GLOBALCHAT/` + key), {
+    set(ref(database, `chats/${props.DBPath}/` + key), {
       key: key,
       time: time,
       'author-email': auth.currentUser.email,
@@ -71,7 +71,7 @@ export default function MainChat({ navigation }) {
           styles.messageItem,
           {
             alignSelf: 'flex-end',
-            backgroundColor: `${colors.purplePale}66`,
+            backgroundColor: `${props.myMessageColor}66`,
             borderBottomRightRadius: 0,
           },
         ]}
@@ -108,7 +108,7 @@ export default function MainChat({ navigation }) {
   }
 
   useEffect(() => {
-    const dataChat = ref(database, `chats/GLOBALCHAT`)
+    const dataChat = ref(database, `chats/${props.DBPath}`)
     onValue(dataChat, (snapshot) => {
       setCurrentChat(snapshot.val())
       //   console.log(snapshot.val())
@@ -125,21 +125,64 @@ export default function MainChat({ navigation }) {
   }, [])
 
   return (
-    <View style={styles.container}>
-      <View style={styles.chatBlock}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            props.theme == 'white'
+              ? colors.themeWhiteBG
+              : colors.themeDarkBGPale,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.chatBlock,
+          {
+            backgroundColor:
+              props.theme == 'white'
+                ? colors.themeWhiteBG
+                : colors.themeDarkBGPale,
+          },
+        ]}
+      >
         <FlatList
           data={Object.values({ ...currentChat }).reverse()}
           inverted={true}
           renderItem={renderItem}
         />
       </View>
-      <View style={[styles.inputBlock, { height: height }]}>
+      <View
+        style={[
+          styles.inputBlock,
+          {
+            backgroundColor:
+              props.theme == 'white' ? colors.themeWhiteBG : colors.themeDarkBG,
+            height: height,
+          },
+        ]}
+      >
         <TextInput
           multiline={true}
           maxLines={5}
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor:
+                props.theme == 'white'
+                  ? colors.themeWhiteBG
+                  : colors.themeDarkBGPale,
+              color: props.theme == 'white' ? colors.dark : colors.white,
+            },
+          ]}
           value={text}
           placeholder="type a message"
+          placeholderTextColor={
+            props.theme == 'white'
+              ? colors.themeWhiteComment
+              : colors.themeDarkComment
+          }
           onChangeText={(text) => setText(text)}
           onContentSizeChange={(event) => {
             const height = event.nativeEvent.contentSize.height + 10
@@ -150,7 +193,11 @@ export default function MainChat({ navigation }) {
           }}
         />
         <TouchableOpacity onPress={() => createMessage()}>
-          <FontAwesome name="send-o" size={30} color="black" />
+          <FontAwesome
+            name="send-o"
+            size={30}
+            color={props.theme == 'white' ? colors.dark : colors.white}
+          />
         </TouchableOpacity>
       </View>
     </View>

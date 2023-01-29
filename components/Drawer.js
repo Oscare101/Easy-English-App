@@ -40,6 +40,8 @@ export default function Drawer(props) {
       path: 'Theory',
       activeBG: colors.redPale,
       activeColor: colors.redActivePale,
+      darBG: colors.darkRed,
+      darkActive: colors.darkRedActive,
     },
     {
       type: 'lesson',
@@ -48,6 +50,8 @@ export default function Drawer(props) {
       path: 'Tests',
       activeBG: colors.bluePale,
       activeColor: colors.blueActivePale,
+      darBG: colors.darkBlue,
+      darkActive: colors.darkBlueActive,
     },
     {
       type: 'lesson',
@@ -56,6 +60,8 @@ export default function Drawer(props) {
       path: 'Certificates',
       activeBG: colors.greenPale,
       activeColor: colors.greenActivePale,
+      darBG: colors.darkGreen,
+      darkActive: colors.darkGreenActive,
     },
     { type: 'line' },
   ]
@@ -67,7 +73,13 @@ export default function Drawer(props) {
           onPress={() => props.setScreen(item.path)}
           style={({ pressed }) => [
             {
-              backgroundColor: pressed ? colors.buttunActivePale : '#fff',
+              backgroundColor: pressed
+                ? props.theme == 'white'
+                  ? colors.buttunActivePale
+                  : colors.themeDarkBGPale
+                : props.theme == 'white'
+                ? colors.themeWhiteBG
+                : colors.themeDarkBG,
             },
             styles.underProfileItem,
           ]}
@@ -77,12 +89,28 @@ export default function Drawer(props) {
               <Ionicons
                 name={item.icon}
                 size={30}
-                color={pressed ? '#232325' : '#76808a'}
+                color={
+                  pressed
+                    ? props.theme == 'white'
+                      ? colors.themeWhiteTextPale
+                      : colors.themeDarkText
+                    : props.theme == 'white'
+                    ? colors.themeWhiteComment
+                    : colors.themeDarkComment
+                }
               />
               <Text
                 style={[
                   styles.underProfileText,
-                  { color: pressed ? '#232325' : '#76808a' },
+                  {
+                    color: pressed
+                      ? props.theme == 'white'
+                        ? colors.themeWhiteTextPale
+                        : colors.themeDarkText
+                      : props.theme == 'white'
+                      ? colors.themeWhiteComment
+                      : colors.themeDarkComment,
+                  },
                 ]}
               >
                 {item.text}
@@ -92,14 +120,30 @@ export default function Drawer(props) {
         </Pressable>
       )
     } else if (item.type == 'line') {
-      return <View style={styles.line} />
+      return (
+        <View
+          style={[
+            styles.line,
+            {
+              backgroundColor:
+                props.theme == 'white'
+                  ? colors.themeWhiteLine
+                  : colors.themeDarkLine,
+            },
+          ]}
+        />
+      )
     } else if (item.type == 'lesson') {
       return (
         <Pressable
           onPress={() => props.setScreen(item.path)}
           style={({ pressed }) => [
             {
-              backgroundColor: pressed ? item.activeBG : '#fff',
+              backgroundColor: pressed
+                ? props.theme == 'white'
+                  ? item.activeBG
+                  : `${item.darBG}33`
+                : '#ffffff00',
             },
             styles.underProfileItem,
           ]}
@@ -109,13 +153,27 @@ export default function Drawer(props) {
               <Ionicons
                 name={item.icon}
                 size={30}
-                color={pressed ? item.activeColor : `${item.activeColor}bb`}
+                color={
+                  pressed
+                    ? props.theme == 'white'
+                      ? `${item.activeColor}`
+                      : item.darkActive
+                    : props.theme == 'white'
+                    ? `${item.activeColor}`
+                    : `${item.darkActive}99`
+                }
               />
               <Text
                 style={[
                   styles.underProfileText,
                   {
-                    color: pressed ? item.activeColor : `${item.activeColor}bb`,
+                    color: pressed
+                      ? props.theme == 'white'
+                        ? `${item.activeColor}`
+                        : item.darkActive
+                      : props.theme == 'white'
+                      ? `${item.activeColor}`
+                      : `${item.darkActive}99`,
                   },
                 ]}
               >
@@ -129,7 +187,15 @@ export default function Drawer(props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            props.theme == 'white' ? colors.themeWhiteBG : colors.themeDarkBG,
+        },
+      ]}
+    >
       <View style={styles.underProfileBlock}>
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -144,7 +210,6 @@ export default function Drawer(props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     flex: 1,
@@ -190,7 +255,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 2,
     borderRadius: 5,
-    backgroundColor: '#aaa',
     marginVertical: 10,
   },
 })
