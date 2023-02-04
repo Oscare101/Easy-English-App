@@ -6,6 +6,12 @@ import FriendsPosts from './FriendsPosts'
 import FrinedsListScreen from './FriendsListScreen'
 import GlobalChatScreen from './GlobalChatScreen'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+// import { createDrawerNavigator } from '@react-navigation/drawer'
+// const Drawer = createDrawerNavigator()
+
+// import SystemNavigationBar from 'react-native-system-navigation-bar'
+// SystemNavigationBar.setBarMode('light')
+
 export default function FirstScreen(props) {
   const [drawer, setDrawer] = useState(false)
   const [screen, setScreen] = useState('Profile')
@@ -24,7 +30,21 @@ export default function FirstScreen(props) {
     getThemeFunc()
   }, [])
 
-  // const [data, setData] = useState({})
+  // function Profile() {
+  //   return (
+  //     <ProfileScreen
+  //       onChange={() => props.onChange('login')}
+  //       theme={theme}
+  //       changeTheme={(newTheme) => {
+  //         ChangeTheme(newTheme)
+  //         setTheme(newTheme)
+  //       }}
+  //     />
+  //   )
+  // }
+  // function FriendsPostsFunc() {
+  //   return <FriendsPosts theme={theme} />
+  // }
 
   const screenData = {
     Profile: (
@@ -66,4 +86,10 @@ export default function FirstScreen(props) {
       )}
     </>
   )
+  // return (
+  //   <Drawer.Navigator useLegacyImplementation>
+  //     <Drawer.Screen name="Feed" component={Profile} />
+  //     <Drawer.Screen name="Article" component={FriendsPostsFunc} />
+  //   </Drawer.Navigator>
+  // )
 }

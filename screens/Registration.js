@@ -49,6 +49,7 @@ export default function RegistrationScreen(props) {
       'user-age': '',
       'user-level': 1,
       'user-status': 'student',
+      friends: ['-'],
     })
   }
 

@@ -3,19 +3,15 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
-  Pressable,
-  Modal,
-  ToastAndroid,
   Image,
-  Alert,
-  Easing,
+  TouchableOpacity,
+  Pressable,
+  ToastAndroid,
 } from 'react-native'
+import colors from '../constants/colors'
 import { Ionicons, AntDesign } from '@expo/vector-icons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LinearGradient } from 'expo-linear-gradient'
-
+import { useIsFocused } from '@react-navigation/native'
 import {
   getDatabase,
   get,
@@ -27,74 +23,75 @@ import {
   remove,
 } from 'firebase/database'
 const database = getDatabase()
-import { signOut } from 'firebase/auth'
 import { auth, db } from '../firebase-config'
-import colors from '../constants/colors'
-import SettingsProfile from '../components/SettingsProfile'
-import PostCreator from '../components/PostCreator'
-import getUserTime from '../components/getUserTime'
 
-import {
-  createStackNavigator,
-  CardStyleInterpolators,
-} from '@react-navigation/stack'
-import NotificationsScreen from './NotificationsScreen'
-const Stack = createStackNavigator()
-
-const timingConfig = {
-  animation: 'timing',
-  config: {
-    duration: 100,
-    easing: Easing.linear,
-  },
-}
-function Profile(props) {
-  // const [theme, setTheme] = useState(props.theme)
+export default function FriendProfileScreen(props) {
+  const isFocused = useIsFocused()
   const [userData, setUserData] = useState({})
-  const [modalProfileVisible, setModalProfileVisible] = useState(false)
-  const [temporaryProfileScreen, setTemporaryProfileScreen] = useState(false)
-  const dataFlatList = [
-    { text: 'Create a new post', icon: 'add-circle-outline', path: 'post' },
+  const [dataFlatList, setDataFlatList] = useState([
     {
-      text: 'Notifications',
-      icon: 'notifications-outline',
-      path: 'Notifications',
+      textIfNotAFriend: 'Ask to be a friend',
+      textIfAFriend: 'You are frineds',
+      icon: 'people-outline',
+      path: 'friend',
     },
-
-    // {
-    //   text: 'Privat chats (-)',
-    //   icon: 'chatbubble-ellipses-outline',
-    //   path: 'post',
-    // },
-    // {
-    //   text: 'Friends',
-    //   icon: 'people-outline',
-    //   path: 'Friends',
-    // },
-  ]
-
-  function logOut() {
-    signOut(auth)
-      .then(async () => {
-        await AsyncStorage.setItem('email', '')
-        await AsyncStorage.setItem('password', '')
-        props.onChange('login')
-      })
-      .catch((error) => {
-        // An error happened.
-      })
-  }
+  ])
 
   function renderItem({ item }) {
     return (
       <Pressable
         onPress={() => {
-          if (item.path == 'post') {
-            setTemporaryProfileScreen(item.path)
-            setModalProfileVisible(true)
-          } else if (item.path == 'Notifications') {
-            // console.log(Object.values(userData.notifications).length - 1)
-            props.onNavigate('Notifications')
+          //   console.log(userData.friends.includes(auth.currentUser.email))
+          if (item.path == 'friend') {
+            if (userData.friends.includes(auth.currentUser.email)) {
+              ToastAndroid.showWithGravity(
+                'You are already friends',
+                ToastAndroid.BOTTOM,
+                ToastAndroid.LONG
+              )
+              return false
+            } else {
+              let days = new Date().getUTCDate().toString()
+              let months = (new Date().getUTCMonth() + 1).toString()
+              let hours = new Date().getUTCHours().toString()
+              let minuts = new Date().getUTCMinutes().toString()
+              let seconds = new Date().getUTCSeconds().toString()
+              let miliDeconds = new Date().getUTCMilliseconds().toString()
+              let key = `${days.length == 1 ? '0' + days : days},${
+                months.length == 1 ? '0' + months : months
+              },${new Date().getUTCFullYear()}_${
+                hours.length == 1 ? '0' + hours : hours
+              }:${minuts.length == 1 ? '0' + minuts : minuts}:${
+                seconds.length == 1 ? '0' + seconds : seconds
+              }:${
+                miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
+              } ${auth.currentUser.email.replace('.', ',')}`
+              update(
+                ref(
+                  database,
+                  `users/${props.user.replace('.', ',')}/notifications/` + key
+                ),
+                {
+                  status: 'friend request',
+                  'friend-email': auth.currentUser.email,
+                  time: new Date().toDateString(),
+                }
+              )
+              update(
+                ref(
+                  database,
+                  `users/${auth.currentUser.email.replace(
+                    '.',
+                    ','
+                  )}/notifications/` + key
+                ),
+                {
+                  status: 'sending friend request',
+                  'friend-email': props.user,
+                  time: new Date().toDateString(),
+                }
+              )
+            }
           }
         }}
         style={({ pressed }) => [
@@ -139,24 +136,16 @@ function Profile(props) {
                 },
               ]}
             >
-              {item.text}
+              {item.textIfNotAFriend}
             </Text>
           </>
         )}
       </Pressable>
     )
   }
-
   function CheckLike(item) {
     let newLikes = item.likes
-    if (item['author-email'] == auth.currentUser.email) {
-      ToastAndroid.showWithGravity(
-        'You cannot like your own posts',
-        ToastAndroid.BOTTOM,
-        ToastAndroid.LONG
-      )
-      return false
-    }
+
     if (item.likes.includes(auth.currentUser.email)) {
       newLikes.splice(
         newLikes.findIndex((i) => i == auth.currentUser.email),
@@ -170,45 +159,17 @@ function Profile(props) {
       likes: newLikes,
     })
     update(
-      ref(
-        database,
-        `users/${auth.currentUser.email.replace('.', ',')}/posts/` + item.key
-      ),
+      ref(database, `users/${props.user.replace('.', ',')}/posts/` + item.key),
       {
         likes: newLikes,
       }
     )
   }
-
-  function Delete(key) {
-    remove(ref(database, 'posts/' + key))
-    remove(
-      ref(
-        database,
-        `users/${auth.currentUser.email.replace('.', ',')}/posts/` + key
-      )
-    )
-  }
-
   function RenderPosts({ item }) {
     // let userTime = getUserTime(item.time)
 
     return (
       <TouchableOpacity
-        onLongPress={() => {
-          Alert.alert('Delete', 'Are you sure you want to delete this post?', [
-            {
-              text: 'Cancel',
-              onPress: () => {},
-              style: 'cancel',
-            },
-            {
-              text: 'Delete',
-              onPress: () => Delete(item.key),
-              style: 'cancel',
-            },
-          ])
-        }}
         style={[
           styles.postView,
           {
@@ -264,7 +225,11 @@ function Profile(props) {
               {item.likes.length - 1}
             </Text>
             <Ionicons
-              name="md-heart-outline"
+              name={
+                item.likes.includes(auth.currentUser.email)
+                  ? 'md-heart'
+                  : 'md-heart-outline'
+              }
               size={20}
               color={props.theme == 'white' ? colors.dark : colors.white}
             />
@@ -273,17 +238,19 @@ function Profile(props) {
       </TouchableOpacity>
     )
   }
-
-  useEffect(() => {
-    const dataAboutUser = ref(
-      database,
-      'users/' + auth.currentUser.email.replace('.', ',')
-    )
-    onValue(dataAboutUser, (snapshot) => {
-      setUserData(snapshot.val())
-    })
-  }, [])
-
+  function renderProfile(item) {
+    if (item.item == 'Profile') {
+      return <TopProfileBlock />
+    } else {
+      return (
+        <FlatList
+          style={{ width: '100%' }}
+          data={item.item.reverse()}
+          renderItem={(item) => RenderPosts(item)}
+        />
+      )
+    }
+  }
   function TopProfileBlock() {
     return (
       <View
@@ -334,48 +301,13 @@ function Profile(props) {
                 },
               ]}
             >
-              {auth.currentUser.email}
-              {auth.currentUser.metadata.lastSignInTime
+              {props.user}
+              {/* {auth.currentUser.metadata.lastSignInTime
                 .split(' ')
                 .splice(1, 3)
-                .join(' ')}
+                .join(' ')} */}
             </Text>
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              setTemporaryProfileScreen('settings')
-              setModalProfileVisible(true)
-            }}
-            style={styles.botBlock}
-          >
-            <View
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    props.theme == 'white' ? colors.dark : colors.white,
-                },
-              ]}
-            />
-            <View
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    props.theme == 'white' ? colors.dark : colors.white,
-                },
-              ]}
-            />
-            <View
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    props.theme == 'white' ? colors.dark : colors.white,
-                },
-              ]}
-            />
-          </TouchableOpacity>
         </View>
         <View style={styles.underProfileBlock}>
           <FlatList
@@ -387,20 +319,18 @@ function Profile(props) {
       </View>
     )
   }
-
-  function renderProfile(item) {
-    if (item.item == 'Profile') {
-      return <TopProfileBlock />
-    } else {
-      return (
-        <FlatList
-          style={{ width: '100%' }}
-          data={item.item.reverse()}
-          renderItem={(item) => RenderPosts(item)}
-        />
+  useEffect(() => {
+    // Call only when screen open or when back on screen
+    if (isFocused) {
+      const dataAboutUser = ref(
+        database,
+        'users/' + props.user.replace('.', ',')
       )
+      onValue(dataAboutUser, (snapshot) => {
+        setUserData(snapshot.val())
+      })
     }
-  }
+  }, [isFocused])
 
   return (
     <View
@@ -412,38 +342,6 @@ function Profile(props) {
         },
       ]}
     >
-      <Modal
-        visible={modalProfileVisible}
-        transparent={true}
-        animationType="none"
-      >
-        {temporaryProfileScreen == 'settings' ? (
-          <SettingsProfile
-            user={userData}
-            theme={props.theme}
-            changeTheme={props.changeTheme}
-            onLogOut={() => logOut()}
-            onClose={() => {
-              setModalProfileVisible(false)
-              setTemporaryProfileScreen(false)
-            }}
-          />
-        ) : temporaryProfileScreen == 'post' ? (
-          <PostCreator
-            user={userData}
-            theme={props.theme}
-            onClose={() => {
-              setModalProfileVisible(false)
-              setTemporaryProfileScreen(false)
-            }}
-          />
-        ) : (
-          <></>
-        )}
-      </Modal>
-
-      {/* <TopProfileBlock /> */}
-
       <View style={styles.postsBlock}>
         <FlatList
           style={{ width: '100%' }}
@@ -452,53 +350,6 @@ function Profile(props) {
         />
       </View>
     </View>
-  )
-}
-
-export default function ProfileScreen(props) {
-  function ProfileFunc({ navigation }) {
-    return (
-      <Profile
-        theme={props.theme}
-        changeTheme={props.changeTheme}
-        onChange={(i) => props.onChange(i)}
-        onNewScreen={(i) => setScreen(i)}
-        onNavigate={(whereTo) => navigation.navigate(whereTo)}
-      />
-    )
-  }
-
-  function NotificationsScreenFunc() {
-    return <NotificationsScreen theme={props.theme} />
-  }
-
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Profile"
-        component={ProfileFunc}
-        options={{
-          headerShown: false,
-          //   headerLeft: () => null,
-        }}
-      />
-      <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreenFunc}
-        options={{
-          headerShown: false,
-          headerLeft: () => null,
-          animationEnabled: true,
-          gestureDirection: 'horizontal',
-          gestureEnabled: true,
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          transitionSpec: {
-            open: timingConfig,
-            close: timingConfig,
-          },
-        }}
-      />
-    </Stack.Navigator>
   )
 }
 
@@ -551,13 +402,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 6,
-    marginTop: 3,
-    backgroundColor: '#111',
-  },
+
   underProfileBlock: {
     flexDirection: 'column',
     justifyContent: 'flex-start',
