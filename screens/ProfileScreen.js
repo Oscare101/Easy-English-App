@@ -60,17 +60,16 @@ function Profile(props) {
       icon: 'notifications-outline',
       path: 'Notifications',
     },
-
-    // {
-    //   text: 'Privat chats (-)',
-    //   icon: 'chatbubble-ellipses-outline',
-    //   path: 'post',
-    // },
-    // {
-    //   text: 'Friends',
-    //   icon: 'people-outline',
-    //   path: 'Friends',
-    // },
+    {
+      text: 'Privat chats (-)',
+      icon: 'chatbubble-ellipses-outline',
+      path: 'chats',
+    },
+    {
+      text: 'Friends (-)',
+      icon: 'people-outline',
+      path: 'Friends',
+    },
   ]
 
   function logOut() {

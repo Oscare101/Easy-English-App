@@ -43,6 +43,7 @@ export default function FriendProfileScreen(props) {
         onPress={() => {
           //   console.log(userData.friends.includes(auth.currentUser.email))
           if (item.path == 'friend') {
+            let exit = false
             if (userData.friends.includes(auth.currentUser.email)) {
               ToastAndroid.showWithGravity(
                 'You are already friends',
@@ -51,46 +52,63 @@ export default function FriendProfileScreen(props) {
               )
               return false
             } else {
-              let days = new Date().getUTCDate().toString()
-              let months = (new Date().getUTCMonth() + 1).toString()
-              let hours = new Date().getUTCHours().toString()
-              let minuts = new Date().getUTCMinutes().toString()
-              let seconds = new Date().getUTCSeconds().toString()
-              let miliDeconds = new Date().getUTCMilliseconds().toString()
-              let key = `${days.length == 1 ? '0' + days : days},${
-                months.length == 1 ? '0' + months : months
-              },${new Date().getUTCFullYear()}_${
-                hours.length == 1 ? '0' + hours : hours
-              }:${minuts.length == 1 ? '0' + minuts : minuts}:${
-                seconds.length == 1 ? '0' + seconds : seconds
-              }:${
-                miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
-              } ${auth.currentUser.email.replace('.', ',')}`
-              update(
-                ref(
-                  database,
-                  `users/${props.user.replace('.', ',')}/notifications/` + key
-                ),
-                {
-                  status: 'friend request',
-                  'friend-email': auth.currentUser.email,
-                  time: new Date().toDateString(),
+              Object.values(userData.notifications).map((i) => {
+                if (
+                  i.status == 'friend request' &&
+                  i['friend-email'] == auth.currentUser.email
+                ) {
+                  // console.log(i)
+                  ToastAndroid.showWithGravity(
+                    'You have already sent a request',
+                    ToastAndroid.BOTTOM,
+                    ToastAndroid.LONG
+                  )
+                  exit = true
+                  return false
                 }
-              )
-              update(
-                ref(
-                  database,
-                  `users/${auth.currentUser.email.replace(
-                    '.',
-                    ','
-                  )}/notifications/` + key
-                ),
-                {
-                  status: 'sending friend request',
-                  'friend-email': props.user,
-                  time: new Date().toDateString(),
-                }
-              )
+              })
+              if (!exit) {
+                let days = new Date().getUTCDate().toString()
+                let months = (new Date().getUTCMonth() + 1).toString()
+                let hours = new Date().getUTCHours().toString()
+                let minuts = new Date().getUTCMinutes().toString()
+                let seconds = new Date().getUTCSeconds().toString()
+                let miliDeconds = new Date().getUTCMilliseconds().toString()
+                let key = `${days.length == 1 ? '0' + days : days},${
+                  months.length == 1 ? '0' + months : months
+                },${new Date().getUTCFullYear()}_${
+                  hours.length == 1 ? '0' + hours : hours
+                }:${minuts.length == 1 ? '0' + minuts : minuts}:${
+                  seconds.length == 1 ? '0' + seconds : seconds
+                }:${
+                  miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
+                } ${auth.currentUser.email.replace('.', ',')}`
+                update(
+                  ref(
+                    database,
+                    `users/${props.user.replace('.', ',')}/notifications/` + key
+                  ),
+                  {
+                    status: 'friend request',
+                    'friend-email': auth.currentUser.email,
+                    time: new Date().toDateString(),
+                  }
+                )
+                update(
+                  ref(
+                    database,
+                    `users/${auth.currentUser.email.replace(
+                      '.',
+                      ','
+                    )}/notifications/` + key
+                  ),
+                  {
+                    status: 'sending friend request',
+                    'friend-email': props.user,
+                    time: new Date().toDateString(),
+                  }
+                )
+              }
             }
           }
         }}
