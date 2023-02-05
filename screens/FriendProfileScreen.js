@@ -90,7 +90,7 @@ export default function FriendProfileScreen(props) {
                   ),
                   {
                     status: 'friend request',
-                    'friend-email': auth.currentUser.email,
+                    email: auth.currentUser.email,
                     time: new Date().toDateString(),
                   }
                 )
@@ -103,8 +103,8 @@ export default function FriendProfileScreen(props) {
                     )}/notifications/` + key
                   ),
                   {
-                    status: 'sending friend request',
-                    'friend-email': props.user,
+                    status: 'sent friend request',
+                    email: props.user,
                     time: new Date().toDateString(),
                   }
                 )
