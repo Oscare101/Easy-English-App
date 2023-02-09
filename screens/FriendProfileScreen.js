@@ -24,6 +24,7 @@ import {
 } from 'firebase/database'
 const database = getDatabase()
 import { auth, db } from '../firebase-config'
+import KeyMaker from '../actions/KeyMaker'
 
 export default function FriendProfileScreen(props) {
   const isFocused = useIsFocused()
@@ -51,6 +52,22 @@ export default function FriendProfileScreen(props) {
                 ToastAndroid.LONG
               )
               return false
+            } else if (
+              Object.values(userData.notifications).filter((i) => {
+                // i.email == auth.currentUser.email &&
+                //   i.status == 'friend request'
+                return (
+                  i.email == auth.currentUser.email &&
+                  i.status == 'friend request'
+                )
+              }).length > 0
+            ) {
+              ToastAndroid.showWithGravity(
+                'You have already sent a request',
+                ToastAndroid.BOTTOM,
+                ToastAndroid.LONG
+              )
+              return false
             } else {
               Object.values(userData.notifications).map((i) => {
                 if (
@@ -68,21 +85,7 @@ export default function FriendProfileScreen(props) {
                 }
               })
               if (!exit) {
-                let days = new Date().getUTCDate().toString()
-                let months = (new Date().getUTCMonth() + 1).toString()
-                let hours = new Date().getUTCHours().toString()
-                let minuts = new Date().getUTCMinutes().toString()
-                let seconds = new Date().getUTCSeconds().toString()
-                let miliDeconds = new Date().getUTCMilliseconds().toString()
-                let key = `${days.length == 1 ? '0' + days : days},${
-                  months.length == 1 ? '0' + months : months
-                },${new Date().getUTCFullYear()}_${
-                  hours.length == 1 ? '0' + hours : hours
-                }:${minuts.length == 1 ? '0' + minuts : minuts}:${
-                  seconds.length == 1 ? '0' + seconds : seconds
-                }:${
-                  miliDeconds.length == 2 ? '0' + miliDeconds : miliDeconds
-                } ${auth.currentUser.email.replace('.', ',')}`
+                const key = KeyMaker(auth.currentUser.email)
                 update(
                   ref(
                     database,
