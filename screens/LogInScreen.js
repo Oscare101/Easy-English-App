@@ -60,7 +60,7 @@ export default function LogInScreen(props) {
         props.onChange('main')
       })
       .catch((err) => {
-        console.log(err.message)
+        // console.log(err.message)
         if (err.message.includes('auth/wrong-password')) {
           setError('Wrong email or password')
         } else {
@@ -79,7 +79,7 @@ export default function LogInScreen(props) {
         LocalAuthentication(getEmail, getPassword)
       }
     } catch (e) {
-      console.log(e)
+      // console.log(e)
     }
   }
 

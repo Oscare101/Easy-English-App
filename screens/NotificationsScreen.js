@@ -32,6 +32,8 @@ const filterData = [
 export default function NotificationsScreen(props) {
   const [filters, setFilters] = useState([])
   const [notificationData, setNotificationData] = useState({})
+  const [myInfo, setMyInfo] = useState({})
+
   function RenderFilter({ item }) {
     return (
       <TouchableOpacity
@@ -58,11 +60,11 @@ export default function NotificationsScreen(props) {
     if (item == '-') return false
     // console.log(item)
     const messages = {
-      'friend request': `User ${item.email} sent you a friend request`,
-      'sent friend request': `You sent a friend request to user ${item.email}`,
-      friends: `You are friends with ${item.email}`,
-      'friend request reject': `You rejected ${item.email} to be your friend`,
-      'sent friend request reject': `User ${item.email} rejected to be your friend`,
+      'friend request': `User ${item.name}[${item.email}] sent you a friend request`,
+      'sent friend request': `You sent a friend request to user ${item.name}[${item.email}]`,
+      friends: `You are friends with ${item.name}[${item.email}]`,
+      'friend request reject': `You rejected ${item.name}[${item.email}] to be your friend`,
+      'sent friend request reject': `User ${item.name}[${item.email}] rejected to be your friend`,
     }
     // console.log(item.status)
     return (
@@ -95,14 +97,43 @@ export default function NotificationsScreen(props) {
           <View style={styles.notificationButtonsView}>
             <Pressable
               onPress={() => {
+                // update(
+                //   ref(
+                //     database,
+                //     `users/${item.email.replace('.', ',')}/notifications/` +
+                //       item.key
+                //   ),
+                //   {
+                //     status: 'friends',
+                //   }
+                // )
+                // update(
+                //   ref(
+                //     database,
+                //     `users/${auth.currentUser.email.replace(
+                //       '.',
+                //       ','
+                //     )}/notifications/` + item.key
+                //   ),
+                //   {
+                //     status: 'friends',
+                //   }
+                // )
+                const chatArr = [
+                  auth.currentUser.email.replace('.', ','),
+                  item.email.replace('.', ','),
+                ].sort()
+                const chatId = `${chatArr[0]}_${chatArr[1]}`
                 update(
                   ref(
                     database,
-                    `users/${item.email.replace('.', ',')}/notifications/` +
-                      item.key
+                    `users/${item.email.replace('.', ',')}/friends/` +
+                      auth.currentUser.email.replace('.', ',')
                   ),
                   {
-                    status: 'friends',
+                    email: auth.currentUser.email,
+                    name: myInfo['user-name'],
+                    'chat-id': chatId,
                   }
                 )
                 update(
@@ -111,10 +142,12 @@ export default function NotificationsScreen(props) {
                     `users/${auth.currentUser.email.replace(
                       '.',
                       ','
-                    )}/notifications/` + item.key
+                    )}/friends/` + item.email.replace('.', ',')
                   ),
                   {
-                    status: 'friends',
+                    email: item.email,
+                    name: item.name,
+                    'chat-id': chatId,
                   }
                 )
               }}
@@ -226,6 +259,13 @@ export default function NotificationsScreen(props) {
     )
     onValue(notificationDataGetter, (snapshot) => {
       setNotificationData(snapshot.val())
+    })
+    const myName = ref(
+      database,
+      'users/' + auth.currentUser.email.replace('.', ',')
+    )
+    onValue(myName, (snapshot) => {
+      setMyInfo(snapshot.val())
     })
   }, [])
 

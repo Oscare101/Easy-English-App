@@ -29,10 +29,11 @@ import KeyMaker from '../actions/KeyMaker'
 export default function FriendProfileScreen(props) {
   const isFocused = useIsFocused()
   const [userData, setUserData] = useState({})
+  const [myInfo, setMyInfo] = useState({})
   const [dataFlatList, setDataFlatList] = useState([
     {
       textIfNotAFriend: 'Ask to be a friend',
-      textIfAFriend: 'You are frineds',
+      textIfAFriend: 'You are friends',
       icon: 'people-outline',
       path: 'friend',
     },
@@ -45,7 +46,11 @@ export default function FriendProfileScreen(props) {
           //   console.log(userData.friends.includes(auth.currentUser.email))
           if (item.path == 'friend') {
             let exit = false
-            if (userData.friends.includes(auth.currentUser.email)) {
+            if (
+              Object.values(userData.friends).filter((i) => {
+                return i.email == auth.currentUser.email
+              }).length > 0
+            ) {
               ToastAndroid.showWithGravity(
                 'You are already friends',
                 ToastAndroid.BOTTOM,
@@ -68,22 +73,38 @@ export default function FriendProfileScreen(props) {
                 ToastAndroid.LONG
               )
               return false
+            } else if (
+              Object.values(userData.notifications).filter((i) => {
+                // i.email == auth.currentUser.email &&
+                //   i.status == 'friend request'
+                return (
+                  i.email == auth.currentUser.email &&
+                  i.status == 'sent friend request'
+                )
+              }).length > 0
+            ) {
+              ToastAndroid.showWithGravity(
+                'This user sent you a request already, check notifications',
+                ToastAndroid.BOTTOM,
+                ToastAndroid.LONG
+              )
+              return false
             } else {
-              Object.values(userData.notifications).map((i) => {
-                if (
-                  i.status == 'friend request' &&
-                  i['friend-email'] == auth.currentUser.email
-                ) {
-                  // console.log(i)
-                  ToastAndroid.showWithGravity(
-                    'You have already sent a request',
-                    ToastAndroid.BOTTOM,
-                    ToastAndroid.LONG
-                  )
-                  exit = true
-                  return false
-                }
-              })
+              // Object.values(userData.notifications).map((i) => {
+              //   if (
+              //     i.status == 'friend request' &&
+              //     i['friend-email'] == auth.currentUser.email
+              //   ) {
+              //     // console.log(i)
+              //     ToastAndroid.showWithGravity(
+              //       'You have already sent a request',
+              //       ToastAndroid.BOTTOM,
+              //       ToastAndroid.LONG
+              //     )
+              //     exit = true
+              //     return false
+              //   }
+              // })
               if (!exit) {
                 const key = KeyMaker(auth.currentUser.email)
                 update(
@@ -94,6 +115,7 @@ export default function FriendProfileScreen(props) {
                   {
                     status: 'friend request',
                     email: auth.currentUser.email,
+                    name: myInfo['user-name'],
                     time: new Date().toDateString(),
                     key: key,
                   }
@@ -109,9 +131,15 @@ export default function FriendProfileScreen(props) {
                   {
                     status: 'sent friend request',
                     email: props.user,
+                    name: userData['user-name'],
                     time: new Date().toDateString(),
                     key: key,
                   }
+                )
+                ToastAndroid.showWithGravity(
+                  'Request is sent',
+                  ToastAndroid.BOTTOM,
+                  ToastAndroid.LONG
                 )
               }
             }
@@ -351,6 +379,13 @@ export default function FriendProfileScreen(props) {
       )
       onValue(dataAboutUser, (snapshot) => {
         setUserData(snapshot.val())
+      })
+      const myName = ref(
+        database,
+        'users/' + auth.currentUser.email.replace('.', ',')
+      )
+      onValue(myName, (snapshot) => {
+        setMyInfo(snapshot.val())
       })
     }
   }, [isFocused])

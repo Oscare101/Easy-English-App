@@ -124,7 +124,7 @@ export default function RegistrationScreen(props) {
                   }
                 })
               } catch (error) {
-                console.log(error)
+                // console.log(error)
               }
               if (text.toLowerCase() !== text) {
                 setWarningEmail(
