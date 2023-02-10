@@ -50,6 +50,7 @@ export default function RegistrationScreen(props) {
       'user-level': 1,
       'user-status': 'student',
       friends: ['-'],
+      notifications: ['-'],
     })
   }
 

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Pressable,
 } from 'react-native'
 import colors from '../constants/colors'
 
@@ -55,15 +56,165 @@ export default function NotificationsScreen(props) {
 
   function RenderNotification({ item }) {
     if (item == '-') return false
-    console.log(item)
+    // console.log(item)
     const messages = {
       'friend request': `User ${item.email} sent you a friend request`,
       'sent friend request': `You sent a friend request to user ${item.email}`,
+      friends: `You are friends with ${item.email}`,
+      'friend request reject': `You rejected ${item.email} to be your friend`,
+      'sent friend request reject': `User ${item.email} rejected to be your friend`,
     }
-    console.log(item.status)
+    // console.log(item.status)
     return (
-      <View>
-        <Text>{messages[item.status]}</Text>
+      <View
+        style={[
+          styles.notificationItem,
+          {
+            backgroundColor:
+              props.theme == 'white'
+                ? colors.themeWhiteBGPale
+                : colors.themeDarkBGPale,
+            borderColor:
+              props.theme == 'white'
+                ? colors.themeWhiteLine
+                : colors.themeDarkLine,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.notificationTitle,
+            {
+              color: props.theme == 'white' ? colors.dark : colors.white,
+            },
+          ]}
+        >
+          {messages[item.status]}
+        </Text>
+        {item.status == 'friend request' ? (
+          <View style={styles.notificationButtonsView}>
+            <Pressable
+              onPress={() => {
+                update(
+                  ref(
+                    database,
+                    `users/${item.email.replace('.', ',')}/notifications/` +
+                      item.key
+                  ),
+                  {
+                    status: 'friends',
+                  }
+                )
+                update(
+                  ref(
+                    database,
+                    `users/${auth.currentUser.email.replace(
+                      '.',
+                      ','
+                    )}/notifications/` + item.key
+                  ),
+                  {
+                    status: 'friends',
+                  }
+                )
+              }}
+              style={({ pressed }) => [
+                styles.notificationButton,
+                {
+                  borderColor: pressed
+                    ? props.theme == 'white'
+                      ? colors.greenActivePale
+                      : colors.darkGreenActive
+                    : props.theme == 'white'
+                    ? colors.greenActivePale
+                    : colors.darkGreenActive,
+                  backgroundColor: pressed
+                    ? props.theme == 'white'
+                      ? colors.darkGreenActive
+                      : colors.greenActivePale
+                    : props.theme == 'white'
+                    ? colors.themeWhiteBGPale
+                    : colors.themeDarkBGPale,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.notificationButtonText,
+                  {
+                    color:
+                      props.theme == 'white'
+                        ? colors.greenActivePale
+                        : colors.darkGreenActive,
+                  },
+                ]}
+              >
+                Accept
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                update(
+                  ref(
+                    database,
+                    `users/${item.email.replace('.', ',')}/notifications/` +
+                      item.key
+                  ),
+                  {
+                    status: 'sent friend request reject',
+                  }
+                )
+                update(
+                  ref(
+                    database,
+                    `users/${auth.currentUser.email.replace(
+                      '.',
+                      ','
+                    )}/notifications/` + item.key
+                  ),
+                  {
+                    status: 'friend request reject',
+                  }
+                )
+              }}
+              style={({ pressed }) => [
+                styles.notificationButton,
+                {
+                  borderColor: pressed
+                    ? props.theme == 'white'
+                      ? colors.redActivePale
+                      : colors.darkRedActive
+                    : props.theme == 'white'
+                    ? colors.redActivePale
+                    : colors.darkRedActive,
+                  backgroundColor: pressed
+                    ? props.theme == 'white'
+                      ? colors.darkRedActive
+                      : colors.redActivePale
+                    : props.theme == 'white'
+                    ? colors.themeWhiteBGPale
+                    : colors.themeDarkBGPale,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.notificationButtonText,
+                  {
+                    color:
+                      props.theme == 'white'
+                        ? colors.redActivePale
+                        : colors.darkRedActive,
+                  },
+                ]}
+              >
+                Refuse
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <></>
+        )}
       </View>
     )
   }
@@ -99,8 +250,9 @@ export default function NotificationsScreen(props) {
           <RenderFilter key={index} item={item} />
         ))}
       </View>
-      <View>
+      <View style={styles.flatListView}>
         <FlatList
+          style={{ width: '100%' }}
           data={Object.values(notificationData)}
           renderItem={RenderNotification}
         />
@@ -116,6 +268,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
   },
+  flatListView: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+    marginTop: 10,
+  },
   // filter
   filterView: {
     flexDirection: 'row',
@@ -129,6 +288,34 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   filterText: {
+    fontSize: 18,
+  },
+  // notifications
+  notificationItem: {
+    width: '95%',
+    padding: 10,
+    borderRadius: 10,
+    alignSelf: 'center',
+    borderWidth: 1,
+  },
+  notificationTitle: {
+    fontSize: 18,
+  },
+  notificationButtonsView: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  notificationButton: {
+    width: '48%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    padding: 5,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  notificationButtonText: {
     fontSize: 18,
   },
 })

@@ -95,6 +95,7 @@ export default function FriendProfileScreen(props) {
                     status: 'friend request',
                     email: auth.currentUser.email,
                     time: new Date().toDateString(),
+                    key: key,
                   }
                 )
                 update(
@@ -109,6 +110,7 @@ export default function FriendProfileScreen(props) {
                     status: 'sent friend request',
                     email: props.user,
                     time: new Date().toDateString(),
+                    key: key,
                   }
                 )
               }
